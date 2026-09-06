@@ -1,5 +1,6 @@
 @startuml name
 
+
 title Fogon Del Barrio
 
 abstract class Pedidos{
@@ -17,77 +18,91 @@ abstract class Pedidos{
 
 }
 
-enum estadoDelPedido{
+class ItemPedido{
+  - nombre: string
+  - producto: producto
+  - cantidad: number
+  - estado: estadoDelPedido
+
+  + enProduccion(): void
+  + enListo(): void
+  + puedeModificarse(): boolean
+}
+enum EstadoDelPedido{
   ESPERA
   PRODUCCION
   LISTO
 }
 
-class pedidoSalon{
-  - mesa: number
+class PedidoSalon{
+  - mesa: mesa
   - lugares: number
   - mozo: number
 }
 
-class pedidoRetirar{
+class Mesa{
+  -numero: number
+}
+
+class PedidoRetirar{
   - telefono: number
   - horarioRetiro: date
 
   + datosDelPedido(): string
 }
 
-class pedidoEnvio{
+class PedidoEnvio{
   - direccion: string
   - costoEnvio: number
 }
 
-Pedidos -L- estadoDelPedido
-Pedidos <|-- pedidoSalon
-Pedidos <|-- pedidoRetirar
-Pedidos <|-- pedidoEnvio
+ItemPedido -- EstadoDelPedido
+ItemPedido --> Producto
+Pedidos -- EstadoDelPedido
+Pedidos <|-- PedidoSalon
+Pedidos <|-- PedidoRetirar
+Pedidos <|-- PedidoEnvio
+PedidoSalon --> Mesa
 
 abstract class Producto{
   - nombre: string
   - categoria: string
-  - precio: number
+  - abstract precioBase: number
 
-  + tieneBenecifio(): boolean
   + abstract precioConBeneficio(): number
   + abstract estacionDeCocina(): string
-  + abstract benecifio(): numbere
+  + abstract benecifio(): number
 }
 
-enum categoria{
+enum Categoria{
   ENTRADA
-  PLATOS PRINCIPALES
+  PLATOS_PRINCIPALES
   BEBIDAS
   POSTRES
 }
 
-class productoUnico{}
-
-class combo{
-  - productoIncluido: string
-  - calcularPrecio: number
+class ProductoUnico{
+  
 }
 
-class beneficioCombo{}
+class Combo{
+  - productoIncluido: string
+}
 
-class beneficioPorDia{}
 
-Producto -l- categoria
-Producto <|-- productoUnico
-Producto <|-- combo
-combo <-l- beneficioCombo
-combo <-d- beneficioPorDia
-productoUnico <-l- beneficioPorDia
+
+Producto -- Categoria
+Producto <|-- ProductoUnico
+Producto <|-- Combo
+'combo <-- beneficioPorDia
+ProductoUnico <-l- Estacion
 
 abstract class Estacion {
   - nombre: string
-  - colaItems: string
+  - colaItems: list<colaDePedidos>
 
-  + abstract recibirItems()
-  + abstratc procesarSiguiente()
+  + abstract recibirItems(): void
+  + abstract procesarSiguiente(): void
 }
 
 class Parrilla {}
@@ -107,7 +122,7 @@ Estacion o-- ItemPedido
 class ItemPedido {
 - nombre: string
 - producto: Producto
-- cantidad: int
+- cantidad: number
 - estado: EstadoItem
 
 + marcarEnPreparacion(): void
@@ -124,6 +139,61 @@ enum EstadoItem {
 ItemPedido -- EstadoItem
 ItemPedido -->Producto
 
+abstract class AplicaBeneficio{
+  - benecidioDisponible: list<beneficios>
+
+  + aplicarMayorBeneficio(): beneficio
+}
+interface Beneficio{
+  + tieneBenecifio(): boolean
+  + calcularPrecio(): number
+  + benecifio(): number
+}
+
+class BenecifioEfectivo{}
+
+class BeneficioCombo{}
+
+class BeneficioPorDia{
+  - diaSemana: date
+}
+
+Beneficio <|.. BeneficioCombo
+Beneficio <|.. BeneficioPorDia
+Beneficio <|.. BenecifioEfectivo
+AplicaBeneficio o-- Beneficio
+
+
+interface Acciones{
+  + aplicar(): void
+  + deshacer(): void
+}
+
+class AgregarItem{
+  - item: ItemPedido
+}
+
+class QuitarItem{
+  - item: ItemPedido
+}
+
+Acciones <|.. AgregarItem
+Acciones <|.. QuitarItem
+Pedidos o-- Acciones
+
+class Factura{
+  - medioDePago: string
+  - fecha: date
+  - totalApagar: number
+  - tieneBenecifio: boolean
+  - pedido: Pedido
+
+}
+
+Factura --> Pedidos
+Factura --> medioDePago
+Factura --> Beneficio
+Factura --> AplicaBeneficio
 
 
 @enduml
