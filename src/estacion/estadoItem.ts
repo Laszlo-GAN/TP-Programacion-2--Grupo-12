@@ -1,5 +1,5 @@
-export class EstadoItem {
-    private estado(): string{
-        return "";
+export enum EstadoItem {
+    PENDIENTE,
+    EN_PREPARACION,
+    LISTO
     }
-}
