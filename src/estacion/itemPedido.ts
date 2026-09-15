@@ -1,5 +1,6 @@
 import { Estacion } from "./estacion";
 import { EstadoItem } from "./estadoItem";
+import { Producto } from "./producto";
 
 export class ItemPedido {
     private id: string;
@@ -7,20 +8,26 @@ export class ItemPedido {
     private cantidad: number;
     private estado: EstadoItem; 
 
-    constructor(){
-        this.id = "";
-        this.producto = "";
-        this.cantidad = 0;
-        this.estado = "";
+    constructor(id: string,producto:Producto,cantidad:number,estado:EstadoItem){
+        this.id = id;
+        this.producto = producto;
+        this.cantidad = cantidad;
+        this.estado = EstadoItem.PENDIENTE;
+    }
+
+    public getEstado(): EstadoItem{
+        return this.estado;
     }
 
     public enPreparacion(): void{
-
+        this.estado = EstadoItem.EN_PREPARACION;
     }
+
     public listo(): void{
-
+        this.estado = EstadoItem.LISTO;
     }
+    
     public puedeModificarse(): boolean{
-        return true;
+        return this.estado === EstadoItem.PENDIENTE;
     }
 }
