@@ -1,13 +1,18 @@
 import { Pedido } from "./pedido";
 export class PedidoEnvio extends Pedido {
-    private direccion: string;
-    private costoEnvio: number;
-    constructor(){
-        this.direccion = "";
-        this.costoEnvio = 0;
+    constructor(id: string, fechaHora: number, private direccion: string, private costoEnvio: number){
+        super()
     }
-    public DatosDelPedido(): string {
-            return "";
-        }
+    public DatosDelPedido(): void{
+        this.getID();
+        this.getFechaHora();
+        this.getEstado();
     }
+    public agregarProducto(): void {
+        
+    }
+    public quitarProducto(): void {
+        
+    }
+    
 }

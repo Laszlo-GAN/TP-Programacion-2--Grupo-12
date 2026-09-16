@@ -2,13 +2,14 @@ import { Estacion } from "./estacion";
 import { EstadoItem } from "./estadoItem";
 
 export class ItemPedido {
-    private id: string;
+    private id: number;
     private producto: Producto;
     private cantidad: number;
-    private estado: EstadoItem; 
+    private estado: EstadoDelPedido;
+
 
     constructor(){
-        this.id = "";
+        this.id = 0;
         this.producto = "";
         this.cantidad = 0;
         this.estado = "";
@@ -22,5 +23,11 @@ export class ItemPedido {
     }
     public puedeModificarse(): boolean{
         return true;
+    }
+    public marcarEnPreparacion(): void{
+
+    }
+    public marcarListo(): void{
+
     }
 }
