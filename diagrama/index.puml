@@ -1,0 +1,136 @@
+@startuml name
+
+skinparam classAttributeIconSize 0
+skinparam linetype ortho
+hide empty members
+
+title Fogon Del Barrio
+
+abstract class Pedidos{
+  - nombre: string
+  - tipoDePedido: string
+  - colaDePedidos: items<list>
+  - fechaHora: date
+
+  + abstract datosDelPedido()
+  + agregarPedido(): void
+  + quitarPedido(): void
+  + deshacerUltimaModificacion(): void
+  + puedeFacturarse(): boolean
+  + calcularTotalProductos(): number
+
+}
+
+enum estadoDelPedido{
+  ESPERA
+  PRODUCCION
+  LISTO
+}
+
+class pedidoSalon{
+  - mesa: number
+  - lugares: number
+  - mozo: number
+}
+
+class pedidoRetirar{
+  - telefono: number
+  - horarioRetiro: date
+
+  + datosDelPedido(): string
+}
+
+class pedidoEnvio{
+  - direccion: string
+  - costoEnvio: number
+}
+
+ItemPedido -- estadoDelPedido
+ItemPedido --> Producto
+pedidoSalon --> Mesa
+Pedidos -- estadoDelPedido
+Pedidos <|-- pedidoSalon
+Pedidos <|-- pedidoRetirar
+Pedidos <|-- pedidoEnvio
+
+abstract class Producto{
+  - nombre: string
+  - categoria: string
+  - precio: number
+
+  + tieneBenecifio(): boolean
+  + abstract precioConBeneficio(): number
+  + abstract estacionDeCocina(): string
+  + abstract benecifio(): numbere
+}
+
+enum categoria{
+  ENTRADA
+  PLATOS PRINCIPALES
+  BEBIDAS
+  POSTRES
+}
+
+class productoUnico{}
+
+class combo{
+  - productoIncluido: string
+  - calcularPrecio: number
+}
+
+class beneficioCombo{}
+
+class beneficioPorDia{}
+
+Producto -- categoria
+Producto <|-- productoUnico
+Producto <|-- combo
+combo <-- beneficioCombo
+combo <-- beneficioPorDia
+productoUnico <-- beneficioPorDia
+
+abstract class Estacion {
+  - nombre: string
+  - colaItems: string
+
+  + abstract recibirItems()
+  + abstratc procesarSiguiente()
+}
+
+class Parrilla {}
+
+class CocinaFria {}
+
+class Barra {}
+
+class CocinaDulce {}
+
+Estacion <|-- Parrilla
+Estacion <|-- CocinaFria
+Estacion <|-- Barra
+Estacion <|-- CocinaDulce
+Estacion o-- ItemPedido 
+
+class ItemPedido {
+- nombre: string
+- producto: Producto
+- cantidad: int
+- estado: EstadoItem
+
++ marcarEnPreparacion(): void
++ marcarListo(): void
++ puedeModificarse(): boolean
+}
+
+enum EstadoItem {
+  PENDIENTE
+  EN_PREPARACION
+  LISTO
+}
+
+ItemPedido -- EstadoItem
+
+
+
+
+@enduml

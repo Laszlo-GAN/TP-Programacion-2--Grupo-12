@@ -1,0 +1,199 @@
+@startuml name
+
+
+title Fogon Del Barrio
+
+abstract class Pedidos{
+  - nombre: string
+  - tipoDePedido: string
+  - colaDePedidos: items<list>
+  - fechaHora: date
+
+  + abstract datosDelPedido()
+  + agregarPedido(): void
+  + quitarPedido(): void
+  + deshacerUltimaModificacion(): void
+  + puedeFacturarse(): boolean
+  + calcularTotalProductos(): number
+
+}
+
+class ItemPedido{
+  - nombre: string
+  - producto: producto
+  - cantidad: number
+  - estado: estadoDelPedido
+
+  + enProduccion(): void
+  + enListo(): void
+  + puedeModificarse(): boolean
+}
+enum EstadoDelPedido{
+  ESPERA
+  PRODUCCION
+  LISTO
+}
+
+class PedidoSalon{
+  - mesa: mesa
+  - lugares: number
+  - mozo: number
+}
+
+class Mesa{
+  -numero: number
+}
+
+class PedidoRetirar{
+  - telefono: number
+  - horarioRetiro: date
+
+  + datosDelPedido(): string
+}
+
+class PedidoEnvio{
+  - direccion: string
+  - costoEnvio: number
+}
+
+ItemPedido -- EstadoDelPedido
+ItemPedido --> Producto
+Pedidos -- EstadoDelPedido
+Pedidos <|-- PedidoSalon
+Pedidos <|-- PedidoRetirar
+Pedidos <|-- PedidoEnvio
+PedidoSalon --> Mesa
+
+abstract class Producto{
+  - nombre: string
+  - categoria: string
+  - abstract precioBase: number
+
+  + abstract precioConBeneficio(): number
+  + abstract estacionDeCocina(): string
+  + abstract benecifio(): number
+}
+
+enum Categoria{
+  ENTRADA
+  PLATOS_PRINCIPALES
+  BEBIDAS
+  POSTRES
+}
+
+class ProductoUnico{
+  
+}
+
+class Combo{
+  - productoIncluido: string
+}
+
+
+
+Producto -- Categoria
+Producto <|-- ProductoUnico
+Producto <|-- Combo
+'combo <-- beneficioPorDia
+ProductoUnico <-l- Estacion
+
+abstract class Estacion {
+  - nombre: string
+  - colaItems: list<colaDePedidos>
+
+  + abstract recibirItems(): void
+  + abstract procesarSiguiente(): void
+}
+
+class Parrilla {}
+
+class CocinaFria {}
+
+class Barra {}
+
+class CocinaDulce {}
+
+Estacion <|-- Parrilla
+Estacion <|-- CocinaFria
+Estacion <|-- Barra
+Estacion <|-- CocinaDulce
+Estacion o-- ItemPedido 
+
+class ItemPedido {
+- nombre: string
+- producto: Producto
+- cantidad: number
+- estado: EstadoItem
+
++ marcarEnPreparacion(): void
++ marcarListo(): void
++ puedeModificarse(): boolean
+}
+
+enum EstadoItem {
+  PENDIENTE
+  EN_PREPARACION
+  LISTO
+}
+
+ItemPedido -- EstadoItem
+ItemPedido -->Producto
+
+abstract class AplicaBeneficio{
+  - benecidioDisponible: list<beneficios>
+
+  + aplicarMayorBeneficio(): beneficio
+}
+interface Beneficio{
+  + tieneBenecifio(): boolean
+  + calcularPrecio(): number
+  + benecifio(): number
+}
+
+class BenecifioEfectivo{}
+
+class BeneficioCombo{}
+
+class BeneficioPorDia{
+  - diaSemana: date
+}
+
+Beneficio <|.. BeneficioCombo
+Beneficio <|.. BeneficioPorDia
+Beneficio <|.. BenecifioEfectivo
+AplicaBeneficio o-- Beneficio
+
+
+interface Acciones{
+  + aplicar(): void
+  + deshacer(): void
+}
+
+class AgregarItem{
+  - item: ItemPedido
+}
+
+class QuitarItem{
+  - item: ItemPedido
+}
+
+Acciones <|.. AgregarItem
+Acciones <|.. QuitarItem
+Pedidos o-- Acciones
+
+class Factura{
+  - medioDePago: string
+  - fecha: date
+  - totalApagar: number
+  - tieneBenecifio: boolean
+  - pedido: Pedido
+
+}
+
+Factura --> Pedidos
+Factura --> medioDePago
+Factura --> Beneficio
+Factura --> AplicaBeneficio
+
+
+@enduml
