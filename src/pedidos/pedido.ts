@@ -14,25 +14,41 @@ export abstract class Pedido {
         this.estadoItem = EstadoItem.PENDIENTE;
         this.tipoEstacion = TipoEstacion;
     }
+
     public getEstadoItem(): EstadoItem{
         return this.estadoItem;
     }
+
     public enPreparacion(): void{
         this.estadoItem = EstadoItem.EN_PREPARACION;
     }
+
     public enListo(): void{
         this.estadoItem = EstadoItem.LISTO;
     }
+
     public getTipoEstacion(): TipoEstacion{
         return this.tipoEstacion;
     }
+
     public abstract DatosDelPedido(): string;
-    public agregarProducto(): void {}
-    public quitarProducto(): void {}
-    public deshacerUltimaModificacion(): void {    }
+
+    public agregarProducto(): void {
+        
+    }
+
+    public quitarProducto(): void {
+
+    }
+
+    public deshacerUltimaModificacion(): void {
+
+    }
+
     public puedeFacturarse(): boolean {
         return true;
     }
+
     public calcularTotalProductos(): number {
         return 0;
     }
