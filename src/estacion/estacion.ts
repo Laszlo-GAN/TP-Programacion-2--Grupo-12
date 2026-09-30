@@ -12,6 +12,19 @@ export abstract class Estacion {
         this.colaItems = [];
         this.estado = estado;
     }
+
+    public getNombre(): string {
+        return this.nombre
+    }
+
+    public getColaItems(): Pedido[] {
+        return this.colaItems
+    }
+    
+    public getEstado(): EstadoEstacion {
+        return this.estado
+    }
+
     
     protected abstract aQueEstacionVa(): void;
 

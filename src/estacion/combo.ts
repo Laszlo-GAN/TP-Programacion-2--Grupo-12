@@ -13,7 +13,7 @@ export default class Combo extends Producto {
     }
 
     public estacionDeCocina(): string {
-
+        
     }
 
     public beneficio(): number {

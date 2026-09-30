@@ -1,5 +1,5 @@
 
 export enum EstadoEstacion{
-        LIBRE,
-        OCUPADA,
-    }
+    LIBRE,
+    OCUPADA,
+}

@@ -1,5 +1,5 @@
-import { ItemPedido } from "./estaciones/itemPedido";
-import { EstadoItem } from "./estaciones/estadoItem";
+import { ItemPedido } from "./itemPedido";
+import { EstadoItem } from "./estadoItem";
 
 export class Estaciones {
     private id: string;
@@ -11,6 +11,18 @@ export class Estaciones {
         this.id = id;
         this.items = [];
         this.facturado = false;
+    }
+
+    public getId(): string {
+        return this.id
+    }
+
+    public getItems(): ItemPedido[] {
+        return this.items
+    }
+
+    public getFcturado(): boolean {
+        return this.facturado
     }
 
     public agregarItem(item: ItemPedido): void 
