@@ -1,5 +1,8 @@
 @startuml name
 
+skinparam classAttributeIconSize 0
+skinparam linetype ortho
+hide empty members
 
 title Fogon Del Barrio
 
@@ -56,14 +59,6 @@ class PedidoEnvio{
   - costoEnvio: number
 }
 
-ItemPedido -- EstadoDelPedido
-ItemPedido --> Producto
-Pedidos -- EstadoDelPedido
-Pedidos <|-- PedidoSalon
-Pedidos <|-- PedidoRetirar
-Pedidos <|-- PedidoEnvio
-PedidoSalon --> Mesa
-
 abstract class Producto{
   - nombre: string
   - categoria: string
@@ -89,14 +84,6 @@ class Combo{
   - productoIncluido: string
 }
 
-
-
-Producto -- Categoria
-Producto <|-- ProductoUnico
-Producto <|-- Combo
-'combo <-- beneficioPorDia
-ProductoUnico <-l- Estacion
-
 abstract class Estacion {
   - nombre: string
   - colaItems: list<colaDePedidos>
@@ -112,12 +99,6 @@ class CocinaFria {}
 class Barra {}
 
 class CocinaDulce {}
-
-Estacion <|-- Parrilla
-Estacion <|-- CocinaFria
-Estacion <|-- Barra
-Estacion <|-- CocinaDulce
-Estacion o-- ItemPedido 
 
 class ItemPedido {
 - nombre: string
@@ -135,9 +116,6 @@ enum EstadoItem {
   EN_PREPARACION
   LISTO
 }
-
-ItemPedido -- EstadoItem
-ItemPedido -->Producto
 
 abstract class AplicaBeneficio{
   - benecidioDisponible: list<beneficios>
@@ -158,12 +136,6 @@ class BeneficioPorDia{
   - diaSemana: date
 }
 
-Beneficio <|.. BeneficioCombo
-Beneficio <|.. BeneficioPorDia
-Beneficio <|.. BenecifioEfectivo
-AplicaBeneficio o-- Beneficio
-
-
 interface Acciones{
   + aplicar(): void
   + deshacer(): void
@@ -177,10 +149,6 @@ class QuitarItem{
   - item: ItemPedido
 }
 
-Acciones <|.. AgregarItem
-Acciones <|.. QuitarItem
-Pedidos o-- Acciones
-
 class Factura{
   - medioDePago: string
   - fecha: date
@@ -189,6 +157,40 @@ class Factura{
   - pedido: Pedido
 
 }
+
+ItemPedido -- EstadoDelPedido
+ItemPedido --> Producto
+Pedidos -- ItemPedido
+Pedidos <|-u- PedidoSalon
+Pedidos <|-l- PedidoRetirar
+Pedidos <|-l- PedidoEnvio
+PedidoSalon -l-> Mesa
+
+Producto -- Categoria
+Producto <|-- ProductoUnico
+Producto <|-- Combo
+'Combo <-- BeneficioPorDia
+ProductoUnico <-l- Estacion
+
+Estacion <|-- Parrilla
+Estacion <|-l- CocinaFria
+Estacion <|-- Barra
+Estacion <|-- CocinaDulce
+Estacion o-r- ItemPedido 
+
+
+ItemPedido -- EstadoItem
+ItemPedido -->Producto
+
+
+Beneficio <|.. BeneficioCombo
+Beneficio <|.. BeneficioPorDia
+Beneficio <|.. BenecifioEfectivo
+AplicaBeneficio o-- Beneficio
+
+Acciones <|.l. AgregarItem
+Acciones <|.. QuitarItem
+Pedidos o-- Acciones
 
 Factura --> Pedidos
 Factura --> medioDePago
