@@ -1,0 +1,92 @@
+@startuml
+    title TranajoPractico
+    abstract class Pedido {
+        - id: string;
+        - fechaHora: Date;
+        - estado: EstadoPedido;
+
+        + abstract datosDelPedido()
+        + agregarProducto(): void
+        + quitarProducto(): void
+        + deshacerUltimaModificacion(): void
+        + puedeFacturarse(): boolean
+        + calcularTotalProductos(): number
+    }
+    class EstadoPedido {
+        - estado: boolean;
+    }
+    class Mesa {
+        - numero: number;
+        - mozo: string;
+    }
+
+    class Producto {
+
+    }
+    class itemPedido {
+        - id: string;
+        - producto: Producto;
+        - cantidad: number;
+        - estado: EstadoItem;
+
+        + enPreparacion(): void
+        + listo(): void
+        + puedeModificarse(): boolean
+    }
+    class PedidoSalon {
+        - mesa: Mesa;
+        - mozo: string;
+
+        + datosDelPedido(): string
+    }
+    class PedidoEnvio {
+        - direccion: string;
+        - costoEnvio: number;
+
+        + datosDelPedido: string
+    }
+
+    class PedidoRetiro {
+        - horarioRetiro: Date;
+
+        + datosDelPedido(): string
+    }
+    abstract class Estacion {
+        - nombre: string;
+        - colaItems: string;
+
+        + abstract recibirItems(): void
+        + abstratc procesarSiguiente(): void 
+    }
+
+    class EstadoItem {
+        - estado(): string
+    }
+    
+    class Parrilla {
+
+    }
+    class CocinaFria {
+
+    }
+    class Barra {
+
+    }
+    class CocinaDulce {
+z
+    }
+    
+    Pedido <|-- PedidoSalon
+    Pedido <|-u- PedidoEnvio
+    Pedido <|-r- PedidoRetiro
+    Pedido -d- EstadoPedido
+    PedidoSalon --> Mesa
+    itemPedido --> Producto
+    itemPedido -l- EstadoItem
+    itemPedido o-u- Estacion
+    Estacion <|-u- Parrilla
+    Estacion <|-l- CocinaDulce
+    Estacion <|-r- CocinaFria
+    Estacion <|-u- Barra 
+
+@enduml
