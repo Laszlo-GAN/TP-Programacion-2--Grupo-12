@@ -8,13 +8,25 @@ export class ItemPedido {
     private cantidad: number;
     private estado: EstadoItem; 
 
-    constructor(id: string,producto:Producto,cantidad:number,estado:EstadoItem){
+    constructor(id: string, producto:Producto, cantidad:number, estado:EstadoItem){
         this.id = id;
         this.producto = producto;
         this.cantidad = cantidad;
         this.estado = EstadoItem.PENDIENTE;
     }
 
+    public getId(): string {
+        return this.id
+    }
+
+    public getProducto(): Producto {
+        return this.producto
+    }
+
+    public getCantidad(): number {
+        return this.cantidad
+    }
+    
     public getEstado(): EstadoItem{
         return this.estado;
     }

@@ -6,13 +6,13 @@ export abstract class Pedido {
     private id: string;
     private fechaHora: Date;
     private estadoItem: EstadoItem;
-    private tipoEstacion = TipoEstacion;
+    private tipoEstacion: TipoEstacion;
 
-    constructor(id: string, fechaHora: Date, estado:EstadoEstacion, tipoEstaciion: TipoEstacion){
+    constructor(id: string, fechaHora: Date, estadoItem:EstadoItem, tipoEstacion: TipoEstacion){
         this.id = id;
         this.fechaHora = fechaHora;
-        this.estadoItem = EstadoItem.PENDIENTE;
-        this.tipoEstacion = TipoEstacion;
+        this.estadoItem = estadoItem;
+        this.tipoEstacion = tipoEstacion
     }
 
     public getEstadoItem(): EstadoItem{
