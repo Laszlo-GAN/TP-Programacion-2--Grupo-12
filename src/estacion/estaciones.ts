@@ -1,5 +1,5 @@
-import { ItemPedido } from "./estaciones/itemPedido";
-import { EstadoItem } from "./estaciones/estadoItem";
+import { ItemPedido } from "./itemPedido";
+import { EstadoItem } from "./estadoItem";
 
 export class Estaciones {
     private id: string;

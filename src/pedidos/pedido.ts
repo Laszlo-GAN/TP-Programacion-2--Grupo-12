@@ -1,40 +1,58 @@
 import { EstadoItem } from "../estacion/estadoItem";
-import { EstadoEstacion } from "../estacion/estadoEstacion";
-import { TipoEstacion } from "./TipoEstacion";
+import { ItemPedido } from "../estacion/itemPedido";
 
 export abstract class Pedido {
     private id: string;
     private fechaHora: Date;
     private estadoItem: EstadoItem;
-    private tipoEstacion = TipoEstacion;
+    private items: ItemPedido[];
 
-    constructor(id: string, fechaHora: Date, estado:EstadoEstacion, tipoEstaciion: TipoEstacion){
+    constructor(id: string, fechaHora: Date) {
         this.id = id;
         this.fechaHora = fechaHora;
         this.estadoItem = EstadoItem.PENDIENTE;
-        this.tipoEstacion = TipoEstacion;
+        this.items = [];
     }
-    public getEstadoItem(): EstadoItem{
+
+    public abstract DatosDelPedido(): void;
+
+    public getEstadoItem(): EstadoItem {
         return this.estadoItem;
     }
-    public enPreparacion(): void{
+
+    public enPreparacion(): void {
         this.estadoItem = EstadoItem.EN_PREPARACION;
     }
-    public enListo(): void{
+
+    public enListo(): void {
         this.estadoItem = EstadoItem.LISTO;
     }
-    public getTipoEstacion(): TipoEstacion{
-        return this.tipoEstacion;
+
+    public agregarItem(item: ItemPedido): void {
+        this.items.push(item);
     }
-    public abstract DatosDelPedido(): string;
-    public agregarProducto(): void {}
-    public quitarProducto(): void {}
-    public deshacerUltimaModificacion(): void {    }
+
+    public quitarItem(item: ItemPedido): void {
+        const posicion = this.items.indexOf(item);
+        if (posicion === -1) {
+            return;
+        }
+        this.items.splice(posicion, 1);
+    }
+
     public puedeFacturarse(): boolean {
+        for (const item of this.items) {
+            if (item.getEstado() !== EstadoItem.LISTO) {
+                return false;
+            }
+        }
         return true;
     }
+
     public calcularTotalProductos(): number {
         return 0;
     }
+
+    public deshacerUltimaModificacion(): void {}
 }
 

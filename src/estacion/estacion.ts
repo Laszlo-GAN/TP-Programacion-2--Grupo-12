@@ -26,7 +26,7 @@ export abstract class Estacion {
         }
         this.estado = EstadoEstacion.OCUPADA;
         const pedidoActual = this.colaItems.shift();
-        pedidoActual?.enPreparacion(); // porque me aparece el "?" solo. si lo saco tira error 
+        pedidoActual?.enPreparacion(); 
         this.estado = EstadoEstacion.LIBRE;
     }
 
