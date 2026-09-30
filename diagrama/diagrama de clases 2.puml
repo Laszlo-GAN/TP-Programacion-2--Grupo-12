@@ -37,11 +37,7 @@ class ItemPedido {
   + puedeModificarse(): boolean
 }
 
-enum EstadoDelPedido{
-  PENDIENTE
-  EN_PREPARACION
-  LISTO
-}
+
 
 class PedidoSalon {
   - mesa: Mesa
@@ -209,8 +205,8 @@ class Factura{
 
 }
 
-ItemPedido -- EstadoDelPedido
-ItemPedido --> Producto
+
+
 Pedido -- ItemPedido
 Pedido <|-u- PedidoSalon
 Pedido <|-l- PedidoRetirar
