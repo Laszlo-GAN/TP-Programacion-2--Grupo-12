@@ -1,0 +1,68 @@
+import { Cocina } from "./estacion/cocina";
+import { ItemPedido } from "./estacion/itemPedido";
+import { ProductoUnico } from "./estacion/productoUnico";
+import { Mesa } from "./estacion/Mesa";
+import { EstadoItem } from "./estacion/estadoItem";
+import { PedidoSalon } from "./pedidos/pedidoSalon";
+import { TipoEstacion } from "./pedidos/TipoEstacion";
+
+
+interface Linea {
+    nombre: string;
+    item: ItemPedido;
+}
+
+function mostrarEstados(lineas: Linea[]): void {
+    for (const linea of lineas) {
+        console.log("   " + linea.nombre + ": " + EstadoItem[linea.item.getEstado()]);
+    }
+}
+
+// ---------- Preparación ----------
+const cocina = new Cocina();
+const pedido = new PedidoSalon("P1", new Date(), new Mesa(5), 4, "Juan");
+
+const lineas: Linea[] = [
+    { nombre: "Hamburguesa", item: new ItemPedido("I1", new ProductoUnico(TipoEstacion.PARRILLA), 1) },
+    { nombre: "Bife",        item: new ItemPedido("I2", new ProductoUnico(TipoEstacion.PARRILLA), 1) },
+    { nombre: "Gaseosa",     item: new ItemPedido("I3", new ProductoUnico(TipoEstacion.BARRA), 2) },
+    { nombre: "Ensalada",    item: new ItemPedido("I4", new ProductoUnico(TipoEstacion.COCINA_FRIA), 1) },
+    { nombre: "Flan",        item: new ItemPedido("I5", new ProductoUnico(TipoEstacion.COCINA_DULCE), 1) },
+];
+
+// ---------- 1. Armar el pedido ----------
+console.log("=== 1. Armar el pedido ===");
+for (const linea of lineas) {
+    pedido.agregarItem(linea.item);
+}
+console.log("   Ítems agregados: " + lineas.length);
+console.log("   ¿Se puede facturar? " + pedido.puedeFacturarse());
+
+// ---------- 2. A qué estación va cada ítem ----------
+console.log("\n=== 2. A qué estación va cada ítem ===");
+for (const linea of lineas) {
+    const estacion = cocina.aQueEstacionVa(linea.item);
+    console.log("   " + linea.nombre + " -> " + TipoEstacion[estacion.getTipo()]);
+}
+
+// ---------- 3. Enviar los ítems a la cocina ----------
+console.log("\n=== 3. Enviar a la cocina ===");
+for (const linea of lineas) {
+    cocina.enviarItem(linea.item);
+}
+mostrarEstados(lineas);
+console.log("   (el Bife espera: la Parrilla está ocupada con la Hamburguesa)");
+
+// ---------- 4. La Parrilla termina la Hamburguesa ----------
+console.log("\n=== 4. La Parrilla termina la Hamburguesa ===");
+cocina.aQueEstacionVa(lineas[0].item).terminarItemActual();
+mostrarEstados(lineas);
+
+// ---------- 5. Terminan todas las demás ----------
+console.log("\n=== 5. Terminan todas las demás ===");
+console.log("   ¿Se puede facturar? " + pedido.puedeFacturarse());
+for (const linea of lineas.slice(1)) {
+    cocina.aQueEstacionVa(linea.item).terminarItemActual();
+}
+mostrarEstados(lineas);
+console.log("   ¿Se puede facturar? " + pedido.puedeFacturarse());

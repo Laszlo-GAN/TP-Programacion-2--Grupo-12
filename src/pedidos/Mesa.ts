@@ -1,9 +1,7 @@
-
-
-export class Mesa  {
+export class Mesa {
     private numero: number;
 
-    constructor(numero: number) {
+    public constructor(numero: number) {
         this.numero = numero;
     }
 

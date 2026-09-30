@@ -6,45 +6,55 @@ hide empty members
 
 title Fogon Del Barrio
 
-abstract class Pedidos{
-  - nombre: string
-  - tipoDePedido: string
-  - colaDePedidos: items<list>
-  - fechaHora: date
-
-  + abstract datosDelPedido()
-  + agregarPedido(): void
-  + quitarPedido(): void
-  + deshacerUltimaModificacion(): void
+abstract class Pedido {
+  - id: string
+  - fechaHora: Date
+  - estadoItem: EstadoItem
+  - items: ItemPedido[]
+  __
+  + {abstract} DatosDelPedido(): string
+  + getEstadoItem(): EstadoItem
+  + enPreparacion(): void
+  + enListo(): void
+  + agregarItem(item: ItemPedido): void
+  + quitarItem(item: ItemPedido): void
   + puedeFacturarse(): boolean
   + calcularTotalProductos(): number
-
+  + deshacerUltimaModificacion(): void
 }
 
-class ItemPedido{
-  - nombre: string
-  - producto: producto
+class ItemPedido {
+  - id: string
+  - producto: Producto
   - cantidad: number
-  - estado: estadoDelPedido
-
-  + enProduccion(): void
-  + enListo(): void
+  - estado: EstadoItem
+ 
+  + getProducto(): Producto
+  + getCantidad(): number
+  + getEstado(): EstadoItem
+  + enPreparacion(): void
+  + listo(): void
   + puedeModificarse(): boolean
 }
+
 enum EstadoDelPedido{
-  ESPERA
-  PRODUCCION
+  PENDIENTE
+  EN_PREPARACION
   LISTO
 }
 
-class PedidoSalon{
-  - mesa: mesa
+class PedidoSalon {
+  - mesa: Mesa
   - lugares: number
-  - mozo: number
+  - mozo: string
+ 
+  + DatosDelPedido(): string
 }
 
 class Mesa{
   -numero: number
+
+  + getNumero(): number
 }
 
 class PedidoRetirar{
@@ -54,19 +64,21 @@ class PedidoRetirar{
   + datosDelPedido(): string
 }
 
-class PedidoEnvio{
+class PedidoEnvio {
   - direccion: string
   - costoEnvio: number
+ 
+  + DatosDelPedido(): string
 }
 
-abstract class Producto{
+abstract class Producto {
   - nombre: string
   - categoria: string
-  - abstract precioBase: number
-
-  + abstract precioConBeneficio(): number
-  + abstract estacionDeCocina(): string
-  + abstract benecifio(): number
+  + {abstract} precioBase: number
+  
+  + {abstract} precioConBeneficio(): number
+  + {abstract} estacionDeCocina(): TipoEstacion
+  + {abstract} beneficio(): number
 }
 
 enum Categoria{
@@ -76,30 +88,69 @@ enum Categoria{
   POSTRES
 }
 
-class ProductoUnico{
+class ProductoUnico {
+  + precioBase: number
+  - tipoEstacion: TipoEstacion
   
+  + precioConBeneficio(): number
+  + estacionDeCocina(): TipoEstacion
+  + beneficio(): number
 }
 
-class Combo{
-  - productoIncluido: string
+class Combo {
+  + precioBase: number
+  
+  + precioConBeneficio(): number
+  + estacionDeCocina(): TipoEstacion
+  + beneficio(): number
 }
 
 abstract class Estacion {
-  - nombre: string
-  - colaItems: list<colaDePedidos>
-
-  + abstract recibirItems(): void
-  + abstract procesarSiguiente(): void
+  # nombre: string
+  # colaItems: ItemPedido[]
+  # itemActual: ItemPedido
+  # estado: EstadoEstacion
+  
+  + {abstract} getTipo(): TipoEstacion
+  + recibirItems(item: ItemPedido): void
+  + procesarSiguiente(): void
+  + terminarItemActual(): void
 }
 
-class Parrilla {}
+class Cocina {
+  - estaciones: Estacion[]
+  
+  + aQueEstacionVa(item: ItemPedido): Estacion
+  + enviarItem(item: ItemPedido): void
+}
 
-class CocinaFria {}
+enum TipoEstacion {
+  PARRILLA
+  COCINA_FRIA
+  BARRA
+  COCINA_DULCE
+}
 
-class Barra {}
+class Parrilla {
+  + getTipo(): TipoEstacion
+}
 
-class CocinaDulce {}
+class CocinaFria {
+  + getTipo(): TipoEstacion
+}
 
+class Barra {
+  + getTipo(): TipoEstacion
+}
+
+class CocinaDulce {
+  + getTipo(): TipoEstacion
+}
+
+enum EstadoEstacion {
+  LIBRE
+  OCUPADA
+}
 class ItemPedido {
 - nombre: string
 - producto: Producto
@@ -160,24 +211,28 @@ class Factura{
 
 ItemPedido -- EstadoDelPedido
 ItemPedido --> Producto
-Pedidos -- ItemPedido
-Pedidos <|-u- PedidoSalon
-Pedidos <|-l- PedidoRetirar
-Pedidos <|-l- PedidoEnvio
+Pedido -- ItemPedido
+Pedido <|-u- PedidoSalon
+Pedido <|-l- PedidoRetirar
+Pedido <|-l- PedidoEnvio
 PedidoSalon -l-> Mesa
 
 Producto -- Categoria
 Producto <|-- ProductoUnico
 Producto <|-- Combo
-'Combo <-- BeneficioPorDia
+Producto ..> TipoEstacion
 ProductoUnico <-l- Estacion
 
+Estacion ..> TipoEstacion
 Estacion <|-- Parrilla
 Estacion <|-l- CocinaFria
 Estacion <|-- Barra
 Estacion <|-- CocinaDulce
 Estacion o-r- ItemPedido 
+Estacion --> EstadoEstacion
 
+Cocina  *--  Estacion
+Cocina ..> ItemPedido 
 
 ItemPedido -- EstadoItem
 ItemPedido -->Producto
@@ -190,9 +245,9 @@ AplicaBeneficio o-- Beneficio
 
 Acciones <|.l. AgregarItem
 Acciones <|.. QuitarItem
-Pedidos o-- Acciones
+Pedido o-- Acciones
 
-Factura --> Pedidos
+Factura --> Pedido
 Factura --> medioDePago
 Factura --> Beneficio
 Factura --> AplicaBeneficio

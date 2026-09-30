@@ -1,36 +1,53 @@
-import { Pedido } from "../pedidos/pedido";
+import { ItemPedido } from "./itemPedido";
 import { EstadoEstacion } from "./estadoEstacion";
-
+import { TipoEstacion } from "../pedidos/TipoEstacion";
 
 export abstract class Estacion {
     protected nombre: string;
-    protected colaItems: Pedido[];
+    protected tipo: TipoEstacion;
+    protected colaItems: ItemPedido[];
+    protected itemActual: ItemPedido | undefined;
     protected estado: EstadoEstacion;
 
-    constructor(nombre: string, estado: EstadoEstacion){
+    public constructor(nombre: string, tipo: TipoEstacion, estado: EstadoEstacion) {
         this.nombre = nombre;
+        this.tipo = tipo;
         this.colaItems = [];
+        this.itemActual = undefined;
         this.estado = estado;
     }
-    
-    protected abstract aQueEstacionVa(): void;
 
-    public recibirItems(pedido:Pedido): void{
-        this.colaItems.push(pedido);
+    // Así la Cocina sabe qué tipo de estación es esta
+    public getTipo(): TipoEstacion {
+        return this.tipo;
+    }
+
+    public recibirItems(item: ItemPedido): void {
+        this.colaItems.push(item);
         this.procesarSiguiente();
     }
-    
-    public procesarSiguiente(): void{
-         if (this.estado === EstadoEstacion.OCUPADA) {
+
+    public procesarSiguiente(): void {
+        if (this.estado === EstadoEstacion.OCUPADA) {
             return;
         }
+        const siguiente = this.colaItems.shift();
+        if (siguiente === undefined) {
+            return; // cola vacía
+        }
+        this.itemActual = siguiente;
         this.estado = EstadoEstacion.OCUPADA;
-        const pedidoActual = this.colaItems.shift();
-        pedidoActual?.enPreparacion(); 
-        this.estado = EstadoEstacion.LIBRE;
+        siguiente.enPreparacion();
     }
 
-   
+    // Se llama cuando la estación termina de preparar el ítem actual
+    public terminarItemActual(): void {
+        if (this.itemActual === undefined) {
+            return;
+        }
+        this.itemActual.listo();
+        this.itemActual = undefined;
+        this.estado = EstadoEstacion.LIBRE;
+        this.procesarSiguiente();
+    }
 }
- 
-

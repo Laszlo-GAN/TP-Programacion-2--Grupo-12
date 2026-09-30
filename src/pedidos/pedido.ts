@@ -1,20 +1,26 @@
 import { EstadoItem } from "../estacion/estadoItem";
 import { ItemPedido } from "../estacion/itemPedido";
+import { Acciones } from "./acciones";
+import { AgregarItem } from "./agregarItem";
+import { QuitarItem } from "./quitarItem";
 
 export abstract class Pedido {
-    private id: string;
+    private codigo: string;
     private fechaHora: Date;
     private estadoItem: EstadoItem;
     private items: ItemPedido[];
+    private historial: Acciones[];
 
-    constructor(id: string, fechaHora: Date) {
-        this.id = id;
+    public constructor(codigo: string, fechaHora: Date) {
+        this.codigo = codigo;
         this.fechaHora = fechaHora;
         this.estadoItem = EstadoItem.PENDIENTE;
         this.items = [];
+        this.historial = [];
     }
 
-    public abstract DatosDelPedido(): void;
+    // Cada tipo de pedido (salón, envío) arma sus propios datos
+    public abstract datosDelPedido(): string;
 
     public getEstadoItem(): EstadoItem {
         return this.estadoItem;
@@ -29,17 +35,26 @@ export abstract class Pedido {
     }
 
     public agregarItem(item: ItemPedido): void {
-        this.items.push(item);
+        const accion = new AgregarItem(this.items, item);
+        accion.aplicar();
+        this.historial.push(accion);
     }
 
     public quitarItem(item: ItemPedido): void {
-        const posicion = this.items.indexOf(item);
-        if (posicion === -1) {
-            return;
-        }
-        this.items.splice(posicion, 1);
+        const accion = new QuitarItem(this.items, item);
+        accion.aplicar();
+        this.historial.push(accion);
     }
 
+    public deshacerUltimaModificacion(): void {
+        const ultima = this.historial.pop();
+        if (ultima === undefined) {
+            return; // no hay nada para deshacer
+        }
+        ultima.deshacer();
+    }
+
+    // Se puede facturar solo si TODOS los ítems están listos
     public puedeFacturarse(): boolean {
         for (const item of this.items) {
             if (item.getEstado() !== EstadoItem.LISTO) {
@@ -50,9 +65,10 @@ export abstract class Pedido {
     }
 
     public calcularTotalProductos(): number {
-        return 0;
+        let total = 0;
+        for (const item of this.items) {
+            total += item.getProducto().precioConBeneficio() * item.getCantidad();
+        }
+        return total;
     }
-
-    public deshacerUltimaModificacion(): void {}
 }
-

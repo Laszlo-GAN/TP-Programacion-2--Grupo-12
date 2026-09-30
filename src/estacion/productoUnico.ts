@@ -1,24 +1,19 @@
-import { Estacion } from "./estacion";
 import { Producto } from "./producto";
+import { TipoEstacion } from "../pedidos/TipoEstacion";
 
 export class ProductoUnico extends Producto {
-    precioBase: number;
-    estacionCocina: Estacion;
-    constructor(estacion: Estacion) {
-        super();
-        this.precioBase = 0
-        this.estacionCocina = estacion;
+    private tipoEstacion: TipoEstacion;
+
+    public constructor(precioBase: number, tipoEstacion: TipoEstacion) {
+        super(precioBase);
+        this.tipoEstacion = tipoEstacion;
     }
 
     public precioConBeneficio(): number {
-        return this.precioBase;
+        return this.precioBase - this.beneficio();
     }
 
-    public estacionDeCocina(): string {
-        this.estacionCocina.procesarSiguiente()
-    }
-
-    public beneficio(): number {
-
+    public estacionDeCocina(): TipoEstacion {
+        return this.tipoEstacion;
     }
 }
