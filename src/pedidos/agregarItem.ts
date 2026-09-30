@@ -15,7 +15,7 @@ export class AgregarItem implements Acciones {
         this.items.push(this.item);
     }
 
-    // Deshacer un "agregar" es quitar ese mismo ítem
+   
     public deshacer(): void {
         const inversa = new QuitarItem(this.items, this.item);
         inversa.aplicar();

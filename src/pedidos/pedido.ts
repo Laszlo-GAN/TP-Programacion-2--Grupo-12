@@ -19,7 +19,7 @@ export abstract class Pedido {
         this.historial = [];
     }
 
-    // Cada tipo de pedido (salón, envío) arma sus propios datos
+   
     public abstract datosDelPedido(): string;
 
     public getEstadoItem(): EstadoItem {
@@ -49,12 +49,12 @@ export abstract class Pedido {
     public deshacerUltimaModificacion(): void {
         const ultima = this.historial.pop();
         if (ultima === undefined) {
-            return; // no hay nada para deshacer
+            return; 
         }
         ultima.deshacer();
     }
 
-    // Se puede facturar solo si TODOS los ítems están listos
+    
     public puedeFacturarse(): boolean {
         for (const item of this.items) {
             if (item.getEstado() !== EstadoItem.LISTO) {

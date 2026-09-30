@@ -10,7 +10,7 @@ export default class Combo extends Producto {
         return this.precioBase - this.beneficio();
     }
 
-    // Pendiente: un combo tiene productos que van a estaciones distintas
+ 
     public estacionDeCocina(): TipoEstacion {
         throw new Error("Combo: falta definir a qué estación va");
     }

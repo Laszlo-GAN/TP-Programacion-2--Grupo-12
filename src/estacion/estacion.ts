@@ -17,7 +17,7 @@ export abstract class Estacion {
         this.estado = estado;
     }
 
-    // Así la Cocina sabe qué tipo de estación es esta
+  
     public getTipo(): TipoEstacion {
         return this.tipo;
     }
@@ -33,14 +33,14 @@ export abstract class Estacion {
         }
         const siguiente = this.colaItems.shift();
         if (siguiente === undefined) {
-            return; // cola vacía
+            return; 
         }
         this.itemActual = siguiente;
         this.estado = EstadoEstacion.OCUPADA;
         siguiente.enPreparacion();
     }
 
-    // Se llama cuando la estación termina de preparar el ítem actual
+   
     public terminarItemActual(): void {
         if (this.itemActual === undefined) {
             return;

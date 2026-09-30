@@ -16,7 +16,7 @@ export class QuitarItem implements Acciones {
 
     public aplicar(): void {
         if (!this.items.includes(this.item)) {
-            return; // el ítem no estaba en el pedido
+            return; 
         }
         const posicion = this.items.indexOf(this.item);
         this.items.splice(posicion, UN_ELEMENTO);

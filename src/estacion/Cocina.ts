@@ -19,7 +19,7 @@ export class Cocina {
         ];
     }
 
-    // Mira el producto del ítem y devuelve la estación donde se prepara
+  
     public aQueEstacionVa(item: ItemPedido): Estacion {
         const tipo = item.getProducto().estacionDeCocina();
         for (const estacion of this.estaciones) {
@@ -30,7 +30,7 @@ export class Cocina {
         throw new Error("No hay ninguna estación de tipo " + TipoEstacion[tipo]);
     }
 
-    // Manda el ítem a la estación que le corresponde
+    
     public enviarItem(item: ItemPedido): void {
         const estacion = this.aQueEstacionVa(item);
         estacion.recibirItems(item);

@@ -18,7 +18,7 @@ export abstract class Producto {
         this.beneficios.push(beneficio);
     }
 
-    // Se aplica el MAYOR de los beneficios disponibles (sin beneficios: no hay descuento)
+   
     public beneficio(): number {
         let mayor = 0;
         for (const opcion of this.beneficios) {
@@ -31,6 +31,6 @@ export abstract class Producto {
     }
 
     public abstract precioConBeneficio(): number;
-    // Dice EN QUÉ TIPO de estación se prepara (no maneja la estación en sí)
+ 
     public abstract estacionDeCocina(): TipoEstacion;
 }
