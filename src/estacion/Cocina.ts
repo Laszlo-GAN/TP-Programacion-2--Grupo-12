@@ -11,12 +11,7 @@ export class Cocina {
     private estaciones: Estacion[];
 
     public constructor() {
-        this.estaciones = [
-            new Parrilla("Parrilla", EstadoEstacion.LIBRE),
-            new CocinaFria("Cocina fría", EstadoEstacion.LIBRE),
-            new CocinaDulce("Cocina dulce", EstadoEstacion.LIBRE),
-            new Barra("Barra", EstadoEstacion.LIBRE),
-        ];
+        this.estaciones = estaciones;
     }
 
   

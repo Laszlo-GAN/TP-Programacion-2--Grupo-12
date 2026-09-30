@@ -6,7 +6,7 @@ import { Mesa } from "./pedidos/Mesa";
 import { PedidoSalon } from "./pedidos/pedidoSalon";
 import { TipoEstacion } from "./pedidos/TipoEstacion";
 
-
+// Cada línea junta un nombre (solo para mostrar por consola) con su ítem
 interface Linea {
     nombre: string;
     item: ItemPedido;
@@ -28,7 +28,7 @@ function mostrarEstados(lineas: Linea[]): void {
     }
 }
 
-
+// ---------- Preparación ----------
 const cocina = new Cocina();
 const pedido = new PedidoSalon("P001", new Date(), new Mesa(NUMERO_MESA), LUGARES_MESA, "Juan");
 
@@ -56,7 +56,7 @@ const flan: Linea = {
 const lineas: Linea[] = [hamburguesa, bife, gaseosa, ensalada, flan];
 const restantes: Linea[] = [bife, gaseosa, ensalada, flan];
 
-
+// ---------- 1. Armar el pedido ----------
 console.log("=== 1. Armar el pedido ===");
 console.log(`   ${pedido.datosDelPedido()}`);
 for (const linea of lineas) {
@@ -66,21 +66,21 @@ console.log(`   Ítems agregados: ${lineas.length}`);
 console.log(`   Total: $${pedido.calcularTotalProductos()}`);
 console.log(`   ¿Se puede facturar? ${pedido.puedeFacturarse()}`);
 
-
+// ---------- 2. Quitar un ítem y deshacer ----------
 console.log("\n=== 2. Quitar el Bife y deshacer ===");
 pedido.quitarItem(bife.item);
 console.log(`   Total sin el Bife: $${pedido.calcularTotalProductos()}`);
 pedido.deshacerUltimaModificacion();
 console.log(`   Total tras deshacer: $${pedido.calcularTotalProductos()}`);
 
-
+// ---------- 3. A qué estación va cada ítem ----------
 console.log("\n=== 3. A qué estación va cada ítem ===");
 for (const linea of lineas) {
     const estacion = cocina.aQueEstacionVa(linea.item);
     console.log(`   ${linea.nombre} -> ${TipoEstacion[estacion.getTipo()]}`);
 }
 
-
+// ---------- 4. Enviar los ítems a la cocina ----------
 console.log("\n=== 4. Enviar a la cocina ===");
 for (const linea of lineas) {
     cocina.enviarItem(linea.item);
@@ -88,12 +88,12 @@ for (const linea of lineas) {
 mostrarEstados(lineas);
 console.log("   (el Bife espera: la Parrilla está ocupada con la Hamburguesa)");
 
-
+// ---------- 5. La Parrilla termina la Hamburguesa ----------
 console.log("\n=== 5. La Parrilla termina la Hamburguesa ===");
 cocina.aQueEstacionVa(hamburguesa.item).terminarItemActual();
 mostrarEstados(lineas);
 
-
+// ---------- 6. Terminan todas las demás ----------
 console.log("\n=== 6. Terminan todas las demás ===");
 console.log(`   ¿Se puede facturar? ${pedido.puedeFacturarse()}`);
 for (const linea of restantes) {
