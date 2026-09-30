@@ -1,0 +1,252 @@
+@startuml name
+
+skinparam classAttributeIconSize 0
+skinparam linetype ortho
+hide empty members
+
+title Fogon Del Barrio
+
+abstract class Pedido {
+  - id: string
+  - fechaHora: Date
+  - estadoItem: EstadoItem
+  - items: ItemPedido[]
+  __
+  + {abstract} DatosDelPedido(): string
+  + getEstadoItem(): EstadoItem
+  + enPreparacion(): void
+  + enListo(): void
+  + agregarItem(item: ItemPedido): void
+  + quitarItem(item: ItemPedido): void
+  + puedeFacturarse(): boolean
+  + calcularTotalProductos(): number
+  + deshacerUltimaModificacion(): void
+}
+
+class ItemPedido {
+  - id: string
+  - producto: Producto
+  - cantidad: number
+  - estado: EstadoItem
+ 
+  + getProducto(): Producto
+  + getCantidad(): number
+  + getEstado(): EstadoItem
+  + enPreparacion(): void
+  + listo(): void
+  + puedeModificarse(): boolean
+}
+
+
+
+class PedidoSalon {
+  - mesa: Mesa
+  - lugares: number
+  - mozo: string
+ 
+  + DatosDelPedido(): string
+}
+
+class Mesa{
+  -numero: number
+
+  + getNumero(): number
+}
+
+class PedidoRetirar{
+  - telefono: number
+  - horarioRetiro: date
+
+  + datosDelPedido(): string
+}
+
+class PedidoEnvio {
+  - direccion: string
+  - costoEnvio: number
+ 
+  + DatosDelPedido(): string
+}
+
+abstract class Producto {
+  - nombre: string
+  - categoria: string
+  + {abstract} precioBase: number
+  
+  + {abstract} precioConBeneficio(): number
+  + {abstract} estacionDeCocina(): TipoEstacion
+  + {abstract} beneficio(): number
+}
+
+enum Categoria{
+  ENTRADA
+  PLATOS_PRINCIPALES
+  BEBIDAS
+  POSTRES
+}
+
+class ProductoUnico {
+  + precioBase: number
+  - tipoEstacion: TipoEstacion
+  
+  + precioConBeneficio(): number
+  + estacionDeCocina(): TipoEstacion
+  + beneficio(): number
+}
+
+class Combo {
+  + precioBase: number
+  
+  + precioConBeneficio(): number
+  + estacionDeCocina(): TipoEstacion
+  + beneficio(): number
+}
+
+abstract class Estacion {
+  # nombre: string
+  # colaItems: ItemPedido[]
+  # itemActual: ItemPedido
+  # estado: EstadoEstacion
+  
+  + {abstract} getTipo(): TipoEstacion
+  + recibirItems(item: ItemPedido): void
+  + procesarSiguiente(): void
+  + terminarItemActual(): void
+}
+
+class Cocina {
+  - estaciones: Estacion[]
+  
+  + aQueEstacionVa(item: ItemPedido): Estacion
+  + enviarItem(item: ItemPedido): void
+}
+
+enum TipoEstacion {
+  PARRILLA
+  COCINA_FRIA
+  BARRA
+  COCINA_DULCE
+}
+
+class Parrilla {
+  + getTipo(): TipoEstacion
+}
+
+class CocinaFria {
+  + getTipo(): TipoEstacion
+}
+
+class Barra {
+  + getTipo(): TipoEstacion
+}
+
+class CocinaDulce {
+  + getTipo(): TipoEstacion
+}
+
+enum EstadoEstacion {
+  LIBRE
+  OCUPADA
+}
+class ItemPedido {
+- nombre: string
+- producto: Producto
+- cantidad: number
+- estado: EstadoItem
+
++ marcarEnPreparacion(): void
++ marcarListo(): void
++ puedeModificarse(): boolean
+}
+
+enum EstadoItem {
+  PENDIENTE
+  EN_PREPARACION
+  LISTO
+}
+
+abstract class AplicaBeneficio{
+  - benecidioDisponible: list<beneficios>
+
+  + aplicarMayorBeneficio(): beneficio
+}
+interface Beneficio{
+  + tieneBenecifio(): boolean
+  + calcularPrecio(): number
+  + benecifio(): number
+}
+
+class BenecifioEfectivo{}
+
+class BeneficioCombo{}
+
+class BeneficioPorDia{
+  - diaSemana: date
+}
+
+interface Acciones{
+  + aplicar(): void
+  + deshacer(): void
+}
+
+class AgregarItem{
+  - item: ItemPedido
+}
+
+class QuitarItem{
+  - item: ItemPedido
+}
+
+class Factura{
+  - medioDePago: string
+  - fecha: date
+  - totalApagar: number
+  - tieneBenecifio: boolean
+  - pedido: Pedido
+
+}
+
+
+
+Pedido -- ItemPedido
+Pedido <|-u- PedidoSalon
+Pedido <|-l- PedidoRetirar
+Pedido <|-l- PedidoEnvio
+PedidoSalon -l-> Mesa
+
+Producto -- Categoria
+Producto <|-- ProductoUnico
+Producto <|-- Combo
+Producto ..> TipoEstacion
+ProductoUnico <-l- Estacion
+
+Estacion ..> TipoEstacion
+Estacion <|-- Parrilla
+Estacion <|-l- CocinaFria
+Estacion <|-- Barra
+Estacion <|-- CocinaDulce
+Estacion o-r- ItemPedido 
+Estacion --> EstadoEstacion
+
+Cocina  *--  Estacion
+Cocina ..> ItemPedido 
+
+ItemPedido -- EstadoItem
+ItemPedido -->Producto
+
+
+Beneficio <|.. BeneficioCombo
+Beneficio <|.. BeneficioPorDia
+Beneficio <|.. BenecifioEfectivo
+AplicaBeneficio o-- Beneficio
+
+Acciones <|.l. AgregarItem
+Acciones <|.. QuitarItem
+Pedido o-- Acciones
+
+Factura --> Pedido
+Factura --> medioDePago
+Factura --> Beneficio
+Factura --> AplicaBeneficio
+
+
+@enduml
