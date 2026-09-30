@@ -1,7 +1,7 @@
 import { ItemPedido } from "./itemPedido";
 import { EstadoItem } from "./estadoItem";
 
-export class Estaciones {
+/*export class Estaciones {
     private id: string;
     private items: ItemPedido[];
     private facturado: boolean;
@@ -44,4 +44,4 @@ export class Estaciones {
     {
         return this.facturado;
     }
-}
+}*/
