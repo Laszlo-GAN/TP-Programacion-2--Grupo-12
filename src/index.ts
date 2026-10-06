@@ -1,10 +1,15 @@
-import { Cocina } from "./estacion/cocina";
+import { Cocina } from "./estacion/Cocina";
+import { Parrilla } from "./estacion/parrilla";
+import { CocinaFria } from "./estacion/cocinaFrea";
+import { CocinaDulce } from "./estacion/cocinaDulce";
+import { Barra } from "./estacion/barra";
+import { EstadoEstacion } from "./estacion/estadoEstacion";
 import { ItemPedido } from "./estacion/itemPedido";
 import { ProductoUnico } from "./estacion/productoUnico";
 import { EstadoItem } from "./estacion/estadoItem";
 import { Mesa } from "./pedidos/Mesa";
 import { PedidoSalon } from "./pedidos/pedidoSalon";
-import { TipoEstacion } from "./pedidos/TipoEstacion";
+import { TipoEstacion } from "./estacion/TipoEstacion";
 
 // Cada línea junta un nombre (solo para mostrar por consola) con su ítem
 interface Linea {
@@ -29,7 +34,12 @@ function mostrarEstados(lineas: Linea[]): void {
 }
 
 // ---------- Preparación ----------
-const cocina = new Cocina();
+const cocina = new Cocina([
+    new Parrilla("Parrilla", EstadoEstacion.LIBRE),
+    new CocinaFria("Cocina fría", EstadoEstacion.LIBRE),
+    new CocinaDulce("Cocina dulce", EstadoEstacion.LIBRE),
+    new Barra("Barra", EstadoEstacion.LIBRE),
+]);
 const pedido = new PedidoSalon("P001", new Date(), new Mesa(NUMERO_MESA), LUGARES_MESA, "Juan");
 
 const hamburguesa: Linea = {

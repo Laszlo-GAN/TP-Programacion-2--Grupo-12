@@ -1,16 +1,13 @@
 import { Estacion } from "./estacion";
-import { EstadoEstacion } from "./estadoEstacion";
+
 import { ItemPedido } from "./itemPedido";
-import { Parrilla } from "./parrilla";
-import { CocinaFria } from "./cocinaFrea";
-import { CocinaDulce } from "./cocinaDulce";
-import { Barra } from "./barra";
-import { TipoEstacion } from "../pedidos/TipoEstacion";
+
+import { TipoEstacion } from "./TipoEstacion";
 
 export class Cocina {
     private estaciones: Estacion[];
 
-    public constructor() {
+    public constructor(estaciones: Estacion[]) {
         this.estaciones = estaciones;
     }
 
