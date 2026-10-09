@@ -1,6 +1,6 @@
 import { Pedido } from "../src/pedidos/pedido";
 import { EstadoItem } from "../src/estacion/estadoItem";
-import { TipoEstacion } from "../src/pedidos/TipoEstacion";
+import { TipoEstacion } from "../src/estacion/TipoEstacion";
 import { beforeEach, describe, expect, jest, test } from "@jest/globals";
 import { PedidoMock } from "./mocks"
 

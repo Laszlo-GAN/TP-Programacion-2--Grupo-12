@@ -1,17 +1,25 @@
 import { EstadoItem } from "./estadoItem";
 import { Producto } from "./producto";
 
+const SIN_PARTES = 0;
+
 export class ItemPedido {
     private codigo: string;
     private producto: Producto;
     private cantidad: number;
     private estado: EstadoItem;
+    private partes: ItemPedido[];
 
     public constructor(codigo: string, producto: Producto, cantidad: number) {
         this.codigo = codigo;
         this.producto = producto;
         this.cantidad = cantidad;
         this.estado = EstadoItem.PENDIENTE;
+        this.partes = [];
+    }
+
+    public getCodigo(): string {
+        return this.codigo;
     }
 
     public getProducto(): Producto {
@@ -22,8 +30,25 @@ export class ItemPedido {
         return this.cantidad;
     }
 
+    public asignarPartes(partes: ItemPedido[]): void {
+        this.partes = partes;
+    }
+
+   
     public getEstado(): EstadoItem {
-        return this.estado;
+        if (this.partes.length === SIN_PARTES) {
+            return this.estado;
+        }
+
+        if (this.partes.every(p => p.getEstado() === EstadoItem.LISTO)) {
+            return EstadoItem.LISTO;
+        }
+
+        if (this.partes.every(p => p.getEstado() === EstadoItem.PENDIENTE)) {
+            return EstadoItem.PENDIENTE;
+        }
+
+        return EstadoItem.EN_PREPARACION;
     }
 
     public enPreparacion(): void {
@@ -35,6 +60,6 @@ export class ItemPedido {
     }
 
     public puedeModificarse(): boolean {
-        return this.estado === EstadoItem.PENDIENTE;
+        return this.getEstado() === EstadoItem.PENDIENTE;
     }
 }

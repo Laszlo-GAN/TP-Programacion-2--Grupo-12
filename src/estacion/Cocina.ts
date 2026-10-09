@@ -1,7 +1,6 @@
 import { Estacion } from "./estacion";
-
 import { ItemPedido } from "./itemPedido";
-
+import { ProductoUnico } from "./productoUnico";
 import { TipoEstacion } from "./TipoEstacion";
 
 export class Cocina {
@@ -11,9 +10,9 @@ export class Cocina {
         this.estaciones = estaciones;
     }
 
-  
-    public aQueEstacionVa(item: ItemPedido): Estacion {
-        const tipo = item.getProducto().estacionDeCocina();
+    
+    public aQueEstacionVa(producto: ProductoUnico): Estacion {
+        const tipo = producto.estacionDeCocina();
         for (const estacion of this.estaciones) {
             if (estacion.getTipo() === tipo) {
                 return estacion;
@@ -22,9 +21,14 @@ export class Cocina {
         throw new Error("No hay ninguna estación de tipo " + TipoEstacion[tipo]);
     }
 
-    
+   
     public enviarItem(item: ItemPedido): void {
-        const estacion = this.aQueEstacionVa(item);
-        estacion.recibirItems(item);
+        const partes: ItemPedido[] = [];
+        for (const producto of item.getProducto().productosDeCocina()) {
+            const parte = new ItemPedido(item.getCodigo(), producto, item.getCantidad());
+            this.aQueEstacionVa(producto).recibirItems(parte);
+            partes.push(parte);
+        }
+        item.asignarPartes(partes);
     }
 }

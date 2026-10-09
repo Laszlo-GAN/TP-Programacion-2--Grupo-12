@@ -5,12 +5,13 @@ const pedido_1 = require("./pedido");
 class PedidoEnvio extends pedido_1.Pedido {
     direccion;
     costoEnvio;
-    constructor() {
-        this.direccion = "";
-        this.costoEnvio = 0;
+    constructor(codigo, fechaHora, direccion, costoEnvio) {
+        super(codigo, fechaHora);
+        this.direccion = direccion;
+        this.costoEnvio = costoEnvio;
     }
-    DatosDelPedido() {
-        return "";
+    datosDelPedido() {
+        return `Envío a ${this.direccion} (costo de envío: $${this.costoEnvio})`;
     }
 }
 exports.PedidoEnvio = PedidoEnvio;

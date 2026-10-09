@@ -6,6 +6,8 @@ import { Barra } from "./estacion/barra";
 import { EstadoEstacion } from "./estacion/estadoEstacion";
 import { ItemPedido } from "./estacion/itemPedido";
 import { ProductoUnico } from "./estacion/productoUnico";
+import Combo from "./estacion/combo";
+import { DescuentoPorcentual } from "./estacion/descuentoPorcentual";
 import { EstadoItem } from "./estacion/estadoItem";
 import { Mesa } from "./pedidos/Mesa";
 import { PedidoSalon } from "./pedidos/pedidoSalon";
@@ -22,6 +24,7 @@ const PRECIO_BIFE = 5200;
 const PRECIO_GASEOSA = 1200;
 const PRECIO_ENSALADA = 2800;
 const PRECIO_FLAN = 2500;
+const DESCUENTO_COMBO = 10;
 const UNA_UNIDAD = 1;
 const DOS_UNIDADES = 2;
 const NUMERO_MESA = 5;
@@ -33,6 +36,13 @@ function mostrarEstados(lineas: Linea[]): void {
     }
 }
 
+// Cada estación involucrada termina el producto que tiene en preparación
+function terminarEnCocina(cocina: Cocina, linea: Linea): void {
+    for (const producto of linea.item.getProducto().productosDeCocina()) {
+        cocina.aQueEstacionVa(producto).terminarItemActual();
+    }
+}
+
 // ---------- Preparación ----------
 const cocina = new Cocina([
     new Parrilla("Parrilla", EstadoEstacion.LIBRE),
@@ -41,6 +51,15 @@ const cocina = new Cocina([
     new Barra("Barra", EstadoEstacion.LIBRE),
 ]);
 const pedido = new PedidoSalon("P001", new Date(), new Mesa(NUMERO_MESA), LUGARES_MESA, "Juan");
+
+const comboParrillero = new Combo(
+    [
+        new ProductoUnico(PRECIO_BIFE, TipoEstacion.PARRILLA),
+        new ProductoUnico(PRECIO_GASEOSA, TipoEstacion.BARRA),
+        new ProductoUnico(PRECIO_FLAN, TipoEstacion.COCINA_DULCE),
+    ],
+    new DescuentoPorcentual(DESCUENTO_COMBO),
+);
 
 const hamburguesa: Linea = {
     nombre: "Hamburguesa",
@@ -62,9 +81,13 @@ const flan: Linea = {
     nombre: "Flan",
     item: new ItemPedido("I005", new ProductoUnico(PRECIO_FLAN, TipoEstacion.COCINA_DULCE), UNA_UNIDAD),
 };
+const combo: Linea = {
+    nombre: "Combo parrillero",
+    item: new ItemPedido("I006", comboParrillero, UNA_UNIDAD),
+};
 
-const lineas: Linea[] = [hamburguesa, bife, gaseosa, ensalada, flan];
-const restantes: Linea[] = [bife, gaseosa, ensalada, flan];
+const lineas: Linea[] = [hamburguesa, bife, gaseosa, ensalada, flan, combo];
+const restantes: Linea[] = [bife, gaseosa, ensalada, flan, combo];
 
 // ---------- 1. Armar el pedido ----------
 console.log("=== 1. Armar el pedido ===");
@@ -73,6 +96,7 @@ for (const linea of lineas) {
     pedido.agregarItem(linea.item);
 }
 console.log(`   Ítems agregados: ${lineas.length}`);
+console.log(`   Combo parrillero (con ${DESCUENTO_COMBO}% off): $${comboParrillero.calcularPrecio()}`);
 console.log(`   Total: $${pedido.calcularTotalProductos()}`);
 console.log(`   ¿Se puede facturar? ${pedido.puedeFacturarse()}`);
 
@@ -83,11 +107,14 @@ console.log(`   Total sin el Bife: $${pedido.calcularTotalProductos()}`);
 pedido.deshacerUltimaModificacion();
 console.log(`   Total tras deshacer: $${pedido.calcularTotalProductos()}`);
 
-// ---------- 3. A qué estación va cada ítem ----------
-console.log("\n=== 3. A qué estación va cada ítem ===");
+// ---------- 3. A qué estaciones va cada ítem ----------
+console.log("\n=== 3. A qué estaciones va cada ítem ===");
 for (const linea of lineas) {
-    const estacion = cocina.aQueEstacionVa(linea.item);
-    console.log(`   ${linea.nombre} -> ${TipoEstacion[estacion.getTipo()]}`);
+    const destinos: string[] = [];
+    for (const producto of linea.item.getProducto().productosDeCocina()) {
+        destinos.push(TipoEstacion[cocina.aQueEstacionVa(producto).getTipo()]);
+    }
+    console.log(`   ${linea.nombre} -> ${destinos.join(", ")}`);
 }
 
 // ---------- 4. Enviar los ítems a la cocina ----------
@@ -96,18 +123,18 @@ for (const linea of lineas) {
     cocina.enviarItem(linea.item);
 }
 mostrarEstados(lineas);
-console.log("   (el Bife espera: la Parrilla está ocupada con la Hamburguesa)");
+console.log("   (lo que comparte estación con algo anterior espera su turno)");
 
 // ---------- 5. La Parrilla termina la Hamburguesa ----------
 console.log("\n=== 5. La Parrilla termina la Hamburguesa ===");
-cocina.aQueEstacionVa(hamburguesa.item).terminarItemActual();
+terminarEnCocina(cocina, hamburguesa);
 mostrarEstados(lineas);
 
-// ---------- 6. Terminan todas las demás ----------
+// ---------- 6. Terminan todas las demás d ----------
 console.log("\n=== 6. Terminan todas las demás ===");
 console.log(`   ¿Se puede facturar? ${pedido.puedeFacturarse()}`);
 for (const linea of restantes) {
-    cocina.aQueEstacionVa(linea.item).terminarItemActual();
+    terminarEnCocina(cocina, linea);
 }
 mostrarEstados(lineas);
 console.log(`   ¿Se puede facturar? ${pedido.puedeFacturarse()}`);

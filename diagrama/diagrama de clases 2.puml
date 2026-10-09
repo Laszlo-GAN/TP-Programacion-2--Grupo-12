@@ -11,7 +11,7 @@ abstract class Pedido {
   - fechaHora: Date
   - estadoItem: EstadoItem
   - items: ItemPedido[]
-  __
+  
   + {abstract} DatosDelPedido(): string
   + getEstadoItem(): EstadoItem
   + enPreparacion(): void

@@ -1,1 +1,1 @@
-{"version":3,"file":"producto.js","sourceRoot":"","sources":["../../src/estacion/producto.ts"],"names":[],"mappings":";;;AAAA,MAAa,QAAQ;CAEpB;AAFD,4BAEC"}
+{"version":3,"file":"producto.js","sourceRoot":"","sources":["../../src/estacion/producto.ts"],"names":[],"mappings":";;;AAEA,MAAsB,QAAQ;IAClB,MAAM,CAAS;IACf,SAAS,CAAS;IAE1B;QACI,IAAI,CAAC,MAAM,GAAG,EAAE,CAAC;QACjB,IAAI,CAAC,SAAS,GAAG,EAAE,CAAC;IACxB,CAAC;CAOJ;AAdD,4BAcC"}
