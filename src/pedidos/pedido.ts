@@ -2,6 +2,7 @@ import { EstadoPedido } from "./estadoPedido";
 import { Dias } from "./dia";
 let dia: Dias;
 export abstract class Pedido {
+<<<<<<< HEAD
     private id: string;
     private fechaHora: number;
     private estado: boolean;
@@ -12,6 +13,23 @@ export abstract class Pedido {
         this.fechaHora = 0;
         this.estado = false;
         this.total = 0;
+=======
+    private id: number;
+    private detalle: string;
+    private fechaHora: Date;
+    private estado: EstadoPedido;
+    public abstract DatosDelPedido(): string;
+
+    constructor(id:number,detalle:string,fechaHora:Date,estado:EstadoPedido,DatosDelPedido:string){
+        this.id = id;
+        this.detalle = detalle;
+        this.fechaHora = fechaHora;
+        this.estado = estado;
+    }
+    public agregarProducto(): void {
+
+        
+>>>>>>> 5acf70b89065f033be8f64c1195dda1bc36d451c
     }
 
     public getID(){
