@@ -1,22 +1,17 @@
 import { Producto } from "./producto";
+import { TipoEstacion } from "../pedidos/TipoEstacion";
 
 export default class Combo extends Producto {
-    precioBase: number;
-    constructor() {
-        super();
-        this.precioBase = 0;
+    public constructor(precioBase: number) {
+        super(precioBase);
     }
 
     public precioConBeneficio(): number {
-        let beneficio = this.beneficio();
-        return this.precioBase - beneficio;
+        return this.precioBase - this.beneficio();
     }
 
-    public estacionDeCocina(): string {
-
-    }
-
-    public beneficio(): number {
-
+ 
+    public estacionDeCocina(): TipoEstacion {
+        throw new Error("Combo: falta definir a qué estación va");
     }
 }

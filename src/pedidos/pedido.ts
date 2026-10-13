@@ -1,40 +1,74 @@
 import { EstadoItem } from "../estacion/estadoItem";
-import { EstadoEstacion } from "../estacion/estadoEstacion";
-import { TipoEstacion } from "./TipoEstacion";
+import { ItemPedido } from "../estacion/itemPedido";
+import { Acciones } from "./acciones";
+import { AgregarItem } from "./agregarItem";
+import { QuitarItem } from "./quitarItem";
 
 export abstract class Pedido {
-    private id: string;
+    private codigo: string;
     private fechaHora: Date;
     private estadoItem: EstadoItem;
-    private tipoEstacion = TipoEstacion;
+    private items: ItemPedido[];
+    private historial: Acciones[];
 
-    constructor(id: string, fechaHora: Date, estado:EstadoEstacion, tipoEstaciion: TipoEstacion){
-        this.id = id;
+    public constructor(codigo: string, fechaHora: Date) {
+        this.codigo = codigo;
         this.fechaHora = fechaHora;
         this.estadoItem = EstadoItem.PENDIENTE;
-        this.tipoEstacion = TipoEstacion;
+        this.items = [];
+        this.historial = [];
     }
-    public getEstadoItem(): EstadoItem{
+
+   
+    public abstract datosDelPedido(): string;
+
+    public getEstadoItem(): EstadoItem {
         return this.estadoItem;
     }
-    public enPreparacion(): void{
+
+    public enPreparacion(): void {
         this.estadoItem = EstadoItem.EN_PREPARACION;
     }
-    public enListo(): void{
+
+    public enListo(): void {
         this.estadoItem = EstadoItem.LISTO;
     }
-    public getTipoEstacion(): TipoEstacion{
-        return this.tipoEstacion;
+
+    public agregarItem(item: ItemPedido): void {
+        const accion = new AgregarItem(this.items, item);
+        accion.aplicar();
+        this.historial.push(accion);
     }
-    public abstract DatosDelPedido(): string;
-    public agregarProducto(): void {}
-    public quitarProducto(): void {}
-    public deshacerUltimaModificacion(): void {    }
+
+    public quitarItem(item: ItemPedido): void {
+        const accion = new QuitarItem(this.items, item);
+        accion.aplicar();
+        this.historial.push(accion);
+    }
+
+    public deshacerUltimaModificacion(): void {
+        const ultima = this.historial.pop();
+        if (ultima === undefined) {
+            return; 
+        }
+        ultima.deshacer();
+    }
+
+    
     public puedeFacturarse(): boolean {
+        for (const item of this.items) {
+            if (item.getEstado() !== EstadoItem.LISTO) {
+                return false;
+            }
+        }
         return true;
     }
+
     public calcularTotalProductos(): number {
-        return 0;
+        let total = 0;
+        for (const item of this.items) {
+            total += item.getProducto().precioConBeneficio() * item.getCantidad();
+        }
+        return total;
     }
 }
-
