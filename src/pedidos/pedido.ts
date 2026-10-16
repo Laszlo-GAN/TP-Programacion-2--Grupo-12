@@ -54,20 +54,14 @@ export abstract class Pedido {
         ultima.deshacer();
     }
 
-    
     public puedeFacturarse(): boolean {
-        for (const item of this.items) {
-            if (item.getEstado() !== EstadoItem.LISTO) {
-                return false;
-            }
-        }
-        return true;
+        return this.items.every(item => item.getEstado() === EstadoItem.LISTO);
     }
 
     public calcularTotalProductos(): number {
         let total = 0;
         for (const item of this.items) {
-            total += item.getProducto().precioConBeneficio() * item.getCantidad();
+            total += item.getProducto().calcularPrecio() * item.getCantidad();
         }
         return total;
     }

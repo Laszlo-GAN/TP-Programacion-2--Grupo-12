@@ -1,6 +1,6 @@
 import { ItemPedido } from "./itemPedido";
 import { EstadoEstacion } from "./estadoEstacion";
-import { TipoEstacion } from "../pedidos/TipoEstacion";
+import { TipoEstacion } from "./TipoEstacion";
 
 export abstract class Estacion {
     protected nombre: string;

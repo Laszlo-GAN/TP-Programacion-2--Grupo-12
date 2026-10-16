@@ -1,0 +1,189 @@
+@startuml Fogon Del Barrio - estado actual del codigo
+
+skinparam classAttributeIconSize 0
+skinparam linetype ortho
+hide empty members
+
+title Fogón del Barrio 
+
+
+abstract class Pedido {
+  - codigo: string
+  - fechaHora: Date
+  - estadoItem: EstadoItem
+  - items: ItemPedido[]
+  - historial: Acciones[]
+  
+  + {abstract} datosDelPedido(): string
+  + getEstadoItem(): EstadoItem
+  + enPreparacion(): void
+  + enListo(): void
+  + agregarItem(item: ItemPedido): void
+  + quitarItem(item: ItemPedido): void
+  + deshacerUltimaModificacion(): void
+  + puedeFacturarse(): boolean
+  + calcularTotalProductos(): number
+}
+
+class PedidoSalon {
+  - mesa: Mesa
+  - lugares: number
+  - mozo: string
+  
+  + datosDelPedido(): string
+}
+
+class PedidoEnvio {
+  - direccion: string
+  - costoEnvio: number
+  
+  + datosDelPedido(): string
+}
+
+class Mesa {
+  - numero: number
+  
+  + getNumero(): number
+}
+
+
+class ItemPedido {
+  - codigo: string
+  - producto: Producto
+  - cantidad: number
+  - estado: EstadoItem
+  - partes: ItemPedido[]
+  
+  + getCodigo(): string
+  + getProducto(): Producto
+  + getCantidad(): number
+  + asignarPartes(partes: ItemPedido[]): void
+  + getEstado(): EstadoItem
+  + enPreparacion(): void
+  + listo(): void
+  + puedeModificarse(): boolean
+}
+
+enum EstadoItem {
+  PENDIENTE
+  EN_PREPARACION
+  LISTO
+}
+
+
+abstract class Producto {
+  - nombre: string
+  - categoria: string
+
+  + {abstract} calcularPrecio(): number
+  + {abstract} productosDeCocina(): ProductoUnico[]
+}
+
+class ProductoUnico {
+  - precioBase: number
+  - tipoEstacion: TipoEstacion
+
+  + calcularPrecio(): number
+  + estacionDeCocina(): TipoEstacion
+  + productosDeCocina(): ProductoUnico[]
+}
+
+class Combo {
+  - productos: Producto[]
+
+  + calcularPrecio(): number
+  + productosDeCocina(): ProductoUnico[]
+}
+
+interface BeneficioCombo {
+  + calcularPrecio(sumaProductos: number): number
+}
+
+class DescuentoPorcentual {
+  - porcentaje: number
+
+  + calcularPrecio(sumaProductos: number): number
+}
+
+class PrecioFijo {
+  - precio: number
+
+  + calcularPrecio(): number
+}
+
+enum TipoEstacion {
+  PARRILLA
+  COCINA_FRIA
+  BARRA
+  COCINA_DULCE
+}
+
+
+class Cocina {
+  - estaciones: Estacion[]
+
+  + aQueEstacionVa(producto: ProductoUnico): Estacion
+  + enviarItem(item: ItemPedido): void
+}
+
+abstract class Estacion {
+  # nombre: string
+  # tipo: TipoEstacion
+  # colaItems: ItemPedido[]
+  # itemActual: ItemPedido
+  # estado: EstadoEstacion
+
+  + getTipo(): TipoEstacion
+  + recibirItems(item: ItemPedido): void
+  + procesarSiguiente(): void
+  + terminarItemActual(): void
+}
+
+class Parrilla {}
+
+class CocinaFria {}
+
+class Barra {}
+
+class CocinaDulce {}
+
+enum EstadoEstacion {
+  LIBRE
+  OCUPADA
+}
+
+
+Pedido <|-- PedidoSalon
+Pedido <|-- PedidoEnvio
+Mesa <-- PedidoSalon 
+
+Pedido  *--  ItemPedido
+EstadoItem <-- Pedido 
+EstadoItem <-- ItemPedido
+Producto <-- ItemPedido
+
+Producto <|-- ProductoUnico
+Producto <|-- Combo
+TipoEstacion <.. ProductoUnico  
+Combo o--  Producto 
+BeneficioCombo <-- Combo 
+BeneficioCombo <|.. DescuentoPorcentual
+BeneficioCombo <|.. PrecioFijo
+ItemPedido o-- ItemPedido 
+Acciones <|.. AgregarItem
+Acciones <|.. QuitarItem
+Pedido o-- Acciones
+
+Cocina  *--  Estacion
+ProductoUnico <.. Cocina
+ItemPedido <.. Cocina
+
+Estacion <|-- Parrilla
+Estacion <|-- CocinaFria
+Estacion <|-- Barra
+Estacion <|-- CocinaDulce
+Estacion --> EstadoEstacion
+Estacion ..> TipoEstacion
+Estacion o--  ItemPedido 
+
+@enduml
