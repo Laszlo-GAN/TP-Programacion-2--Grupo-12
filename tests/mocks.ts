@@ -1,40 +1,36 @@
-import { Estacion } from "../src/estacion/estacion"
-import { EstadoEstacion } from "../src/estacion/estadoEstacion"
-import { Pedido } from "../src/pedidos/pedido"
-import { Producto } from "../src/estacion/producto"
+import { Estacion } from "../src/estacion/estacion";
+import { EstadoEstacion } from "../src/estacion/estadoEstacion";
+import { ItemPedido } from "../src/estacion/itemPedido";
+import { ProductoUnico } from "../src/estacion/productoUnico";
+import { TipoEstacion } from "../src/estacion/TipoEstacion";
+import { Pedido } from "../src/pedidos/pedido";
 
 
 export class EstacionMock extends Estacion {
-    protected aQueEstacionVa(): void {}
-    
-    public getEstado(): EstadoEstacion {
-        return this.estado
+    public constructor(nombre: string, estado: EstadoEstacion) {
+        super(nombre, TipoEstacion.PARRILLA, estado);
     }
 
-    public getColaItems(): Pedido[] {
-        return this.colaItems
+    public getEstado(): EstadoEstacion {
+        return this.estado;
+    }
+
+    public getColaItems(): ItemPedido[] {
+        return this.colaItems;
+    }
+
+    public getNombre(): string {
+        return this.nombre;
     }
 }
 
 export class PedidoMock extends Pedido {
-    public DatosDelPedido(): string {
+    public datosDelPedido(): string {
         return "Pedido de prueba";
     }
 }
 
-export class ProductoMock extends Producto {
 
-    precioBase: number = 100;
-
-    public precioConBeneficio(): number {
-        return 120;
-    }
-
-    public estacionDeCocina(): string {
-        return "Parrilla";
-    }
-
-    public beneficio(): number {
-        return 20;
-    }
+export function crearItem(codigo: string, precio: number = 100, cantidad: number = 1): ItemPedido {
+    return new ItemPedido(codigo, new ProductoUnico(precio, TipoEstacion.PARRILLA), cantidad);
 }

@@ -40,11 +40,11 @@ export class ItemPedido {
             return this.estado;
         }
 
-        if (this.partes.every(p => p.getEstado() === EstadoItem.LISTO)) {
+        if (this.partes.every(parte => parte.getEstado() === EstadoItem.LISTO)) {
             return EstadoItem.LISTO;
         }
 
-        if (this.partes.every(p => p.getEstado() === EstadoItem.PENDIENTE)) {
+        if (this.partes.every(parte => parte.getEstado() === EstadoItem.PENDIENTE)) {
             return EstadoItem.PENDIENTE;
         }
 
