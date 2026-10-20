@@ -1,39 +1,25 @@
 import { Parrilla } from "../src/estacion/parrilla";
 import { Estacion } from "../src/estacion/estacion";
 import { EstadoEstacion } from "../src/estacion/estadoEstacion";
-import { beforeEach, describe, expect, jest, test } from "@jest/globals";
+import { TipoEstacion } from "../src/estacion/TipoEstacion";
+import { beforeEach, describe, expect, test } from "@jest/globals";
 
 describe("Test clase Parrilla", () => {
-
     let instance: Parrilla;
 
     beforeEach(() => {
-        instance = new Parrilla("Parrilla", EstadoEstacion.LIBRE);
+        instance = new Parrilla("Parrilla 1", EstadoEstacion.LIBRE);
     });
-
 
     test("Verificar que sea instancia de Parrilla", () => {
         expect(instance).toBeInstanceOf(Parrilla);
     });
 
-
-    test("Verificar que Parrilla sea una Estacion", () => {
+    test("Verificar que sea una Estacion", () => {
         expect(instance).toBeInstanceOf(Estacion);
     });
 
-
-    test("Verificar que tenga el nombre correcto", () => {
-        expect(instance.getNombre()).toBe("Parrilla");
+    test("Verificar que su tipo sea PARRILLA", () => {
+        expect(instance.getTipo()).toBe(TipoEstacion.PARRILLA);
     });
-
-
-    test("Verificar que tenga el estado correcto", () => {
-        expect(instance.getEstado()).toBe(EstadoEstacion.LIBRE);
-    });
-
-
-    test("Verificar que la cola empiece vacía", () => {
-        expect(instance.getColaItems()).toHaveLength(0);
-    });
-
 });

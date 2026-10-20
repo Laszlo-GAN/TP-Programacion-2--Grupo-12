@@ -1,24 +1,25 @@
-import { EstadoEstacion } from "../src/estacion/estadoEstacion";
+import { CocinaFria } from "../src/estacion/cocinaFrea";
 import { Estacion } from "../src/estacion/estacion";
-import { CocinaFria } from "../src/estacion/cocinaFrea"
-import { beforeEach, describe, expect, jest, test, afterEach } from "@jest/globals";
-
+import { EstadoEstacion } from "../src/estacion/estadoEstacion";
+import { TipoEstacion } from "../src/estacion/TipoEstacion";
+import { beforeEach, describe, expect, test } from "@jest/globals";
 
 describe("Test clase CocinaFria", () => {
-    let instance: CocinaFria
+    let instance: CocinaFria;
 
     beforeEach(() => {
-        instance = new CocinaFria("CocinaFria1", EstadoEstacion.LIBRE)
+        instance = new CocinaFria("CocinaFria 1", EstadoEstacion.LIBRE);
     });
 
-    afterEach(() => {});
-
-    test("Verificar si es instancia de Barra", () => {
-        expect(instance).toBeInstanceOf(CocinaFria)
+    test("Verificar que sea instancia de CocinaFria", () => {
+        expect(instance).toBeInstanceOf(CocinaFria);
     });
 
-    test("Pruebo metodo para determinar a que estacion va", () => {
-        //sin implementacion por ahora
+    test("Verificar que sea una Estacion", () => {
+        expect(instance).toBeInstanceOf(Estacion);
     });
 
-})
+    test("Verificar que su tipo sea COCINA_FRIA", () => {
+        expect(instance.getTipo()).toBe(TipoEstacion.COCINA_FRIA);
+    });
+});
