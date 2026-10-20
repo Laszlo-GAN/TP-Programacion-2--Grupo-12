@@ -1,4 +1,4 @@
-@startuml Fogon Del Barrio - estado actual del codigo
+@startuml 
 
 skinparam classAttributeIconSize 0
 skinparam linetype ortho
@@ -6,6 +6,7 @@ hide empty members
 
 title Fogón del Barrio 
 
+' ========== PEDIDOS ==========
 
 abstract class Pedido {
   - codigo: string
@@ -13,7 +14,7 @@ abstract class Pedido {
   - estadoItem: EstadoItem
   - items: ItemPedido[]
   - historial: Acciones[]
-  
+ 
   + {abstract} datosDelPedido(): string
   + getEstadoItem(): EstadoItem
   + enPreparacion(): void
@@ -29,23 +30,24 @@ class PedidoSalon {
   - mesa: Mesa
   - lugares: number
   - mozo: string
-  
+ 
   + datosDelPedido(): string
 }
 
 class PedidoEnvio {
   - direccion: string
   - costoEnvio: number
-  
+
   + datosDelPedido(): string
 }
 
 class Mesa {
   - numero: number
-  
+
   + getNumero(): number
 }
 
+' ========== ITEMS ==========
 
 class ItemPedido {
   - codigo: string
@@ -53,7 +55,7 @@ class ItemPedido {
   - cantidad: number
   - estado: EstadoItem
   - partes: ItemPedido[]
-  
+
   + getCodigo(): string
   + getProducto(): Producto
   + getCantidad(): number
@@ -70,11 +72,12 @@ enum EstadoItem {
   LISTO
 }
 
+' ========== PRODUCTOS ==========
 
 abstract class Producto {
   - nombre: string
   - categoria: string
-
+ 
   + {abstract} calcularPrecio(): number
   + {abstract} productosDeCocina(): ProductoUnico[]
 }
@@ -111,6 +114,28 @@ class PrecioFijo {
   + calcularPrecio(): number
 }
 
+interface Acciones {
+  + aplicar(): void
+  + deshacer(): void
+}
+
+class AgregarItem {
+  - items: ItemPedido[]
+  - item: ItemPedido
+
+  + aplicar(): void
+  + deshacer(): void
+}
+
+class QuitarItem {
+  - items: ItemPedido[]
+  - item: ItemPedido
+  - seQuito: boolean
+
+  + aplicar(): void
+  + deshacer(): void
+}
+
 enum TipoEstacion {
   PARRILLA
   COCINA_FRIA
@@ -118,6 +143,7 @@ enum TipoEstacion {
   COCINA_DULCE
 }
 
+' ========== COCINA Y ESTACIONES ==========
 
 class Cocina {
   - estaciones: Estacion[]
@@ -152,31 +178,32 @@ enum EstadoEstacion {
   OCUPADA
 }
 
+' ========== RELACIONES ==========
 
 Pedido <|-- PedidoSalon
 Pedido <|-- PedidoEnvio
-Mesa <-- PedidoSalon 
+PedidoSalon --> Mesa
 
 Pedido  *--  ItemPedido
-EstadoItem <-- Pedido 
-EstadoItem <-- ItemPedido
-Producto <-- ItemPedido
+Pedido --> EstadoItem
+ItemPedido --> EstadoItem
+ItemPedido --> Producto
 
 Producto <|-- ProductoUnico
 Producto <|-- Combo
-TipoEstacion <.. ProductoUnico  
+ProductoUnico ..> TipoEstacion
 Combo o--  Producto 
-BeneficioCombo <-- Combo 
+Combo --> BeneficioCombo
 BeneficioCombo <|.. DescuentoPorcentual
 BeneficioCombo <|.. PrecioFijo
-ItemPedido o-- ItemPedido 
+
 Acciones <|.. AgregarItem
 Acciones <|.. QuitarItem
-Pedido o-- Acciones
+Pedido o--  Acciones
 
-Cocina  *--  Estacion
-ProductoUnico <.. Cocina
-ItemPedido <.. Cocina
+Cocina *--  Estacion
+Cocina ..> ProductoUnico 
+Cocina ..> ItemPedido 
 
 Estacion <|-- Parrilla
 Estacion <|-- CocinaFria
@@ -184,6 +211,6 @@ Estacion <|-- Barra
 Estacion <|-- CocinaDulce
 Estacion --> EstadoEstacion
 Estacion ..> TipoEstacion
-Estacion o--  ItemPedido 
+Estacion o--  ItemPedido
 
 @enduml
