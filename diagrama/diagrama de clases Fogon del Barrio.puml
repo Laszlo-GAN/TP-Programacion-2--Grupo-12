@@ -11,19 +11,26 @@ title Fogon Del Barrio
 abstract class Pedido {
   - codigo: string
   - fechaHora: Date
-  - estadoItem: EstadoItem
+  - estado: EstadoPedido
   - items: ItemPedido[]
   - historial: Acciones[]
- 
+  
   + {abstract} datosDelPedido(): string
-  + getEstadoItem(): EstadoItem
-  + enPreparacion(): void
-  + enListo(): void
+  + getEstado(): EstadoPedido
   + agregarItem(item: ItemPedido): void
   + quitarItem(item: ItemPedido): void
   + deshacerUltimaModificacion(): void
+  + confirmar(cocina: Cocina): void
   + puedeFacturarse(): boolean
+  + finalizar(): void
   + calcularTotalProductos(): number
+  - verificarEnConstruccion(): void
+}
+
+enum EstadoPedido {
+  EN_CONSTRUCCION
+  CONFIRMADO
+  FINALIZADO
 }
 
 class Mesa {
@@ -100,6 +107,7 @@ class QuitarItem {
   - items: ItemPedido[]
   - item: ItemPedido
   - seQuito: boolean
+  - posicion: number
 
   + aplicar(): void
   + deshacer(): void
@@ -113,9 +121,10 @@ enum TipoEstacion {
 }
 Acciones <|.. AgregarItem
 Acciones <|.. QuitarItem
-Pedido o-- Acciones
-Pedido*--  ItemPedido
-Pedido --> EstadoItem
+Pedido o-- Acciones 
+Pedido  *--  ItemPedido
+Pedido --> EstadoPedido
+Pedido ..> Cocina 
 Producto <|-- ProductoUnico
 Producto <|-- Combo
 
@@ -158,8 +167,8 @@ ProductoUnico .u.> TipoEstacion
 Estacion --> EstadoEstacion
 Estacion ..> TipoEstacion
 Cocina o--  Estacion
-Cocina ..> ProductoUnico
-Cocina ..> ItemPedido
+Cocina ..> ProductoUnico 
+Cocina ..> ItemPedido 
 Estacion <|-- Parrilla
 Estacion <|-- CocinaFria
 Estacion <|-- Barra
@@ -230,7 +239,7 @@ Beneficio <|.. BeneficioPorDia
 Beneficio <|.. BeneficioEfectivo
 AplicaBeneficio o-- Beneficio
 Combo --> BeneficioCombo
-Combo o--  Producto 
+Combo o--  Producto
 BeneficioCombo <|.. DescuentoPorcentual
 BeneficioCombo <|.. PrecioFijo
 
