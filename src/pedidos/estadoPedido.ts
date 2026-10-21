@@ -1,7 +1,5 @@
-export class EstadoPedido {
-    private estado: string;
-
-    public constructor() {
-        this.estado = "";
-    }
+export enum EstadoPedido {
+    EN_CONSTRUCCION,
+    CONFIRMADO,
+    FINALIZADO,
 }
