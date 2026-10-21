@@ -1,10 +1,10 @@
-@startuml 
+@startuml Fogon Del Barrio
 
 skinparam classAttributeIconSize 0
 skinparam linetype ortho
 hide empty members
 
-title Fogón del Barrio 
+title Fogon Del Barrio
 
 ' ========== PEDIDOS ==========
 
@@ -26,86 +26,55 @@ abstract class Pedido {
   + calcularTotalProductos(): number
 }
 
-class PedidoSalon {
-  - mesa: Mesa
-  - lugares: number
-  - mozo: string
- 
-  + datosDelPedido(): string
-}
-
-class PedidoEnvio {
-  - direccion: string
-  - costoEnvio: number
-
-  + datosDelPedido(): string
-}
-
 class Mesa {
   - numero: number
 
   + getNumero(): number
 }
 
-' ========== ITEMS ==========
+class PedidoSalon{
+  - mesa: Mesa
+  - lugares: number
+  - mozo: string
 
-class ItemPedido {
-  - codigo: string
-  - producto: Producto
-  - cantidad: number
-  - estado: EstadoItem
-  - partes: ItemPedido[]
-
-  + getCodigo(): string
-  + getProducto(): Producto
-  + getCantidad(): number
-  + asignarPartes(partes: ItemPedido[]): void
-  + getEstado(): EstadoItem
-  + enPreparacion(): void
-  + listo(): void
-  + puedeModificarse(): boolean
+  + datosDelPedido(): string
 }
 
-enum EstadoItem {
-  PENDIENTE
-  EN_PREPARACION
-  LISTO
+class PedidoRetirar {
+  - horarioRetiro: Date
+
+  + datosDelPedido(): string
 }
 
-' ========== PRODUCTOS ==========
+class PedidoEnvio{
+  - direccion: string
+  - costoEnvio: number
 
-abstract class Producto {
+  + datosDelPedido(): string
+}
+
+Pedido <|-- PedidoSalon
+Pedido <|-- PedidoRetirar
+Pedido <|-- PedidoEnvio
+PedidoSalon --> Mesa
+
+' ============== PRODUCTO ===========
+
+abstract class Producto{
   - nombre: string
   - categoria: string
- 
+  
   + {abstract} calcularPrecio(): number
   + {abstract} productosDeCocina(): ProductoUnico[]
 }
 
-class ProductoUnico {
+class ProductoUnico{
   - precioBase: number
   - tipoEstacion: TipoEstacion
 
   + calcularPrecio(): number
   + estacionDeCocina(): TipoEstacion
   + productosDeCocina(): ProductoUnico[]
-}
-
-class Combo {
-  - productos: Producto[]
-
-  + calcularPrecio(): number
-  + productosDeCocina(): ProductoUnico[]
-}
-
-interface BeneficioCombo {
-  + calcularPrecio(sumaProductos: number): number
-}
-
-class DescuentoPorcentual {
-  - porcentaje: number
-
-  + calcularPrecio(sumaProductos: number): number
 }
 
 class PrecioFijo {
@@ -142,8 +111,15 @@ enum TipoEstacion {
   BARRA
   COCINA_DULCE
 }
+Acciones <|.. AgregarItem
+Acciones <|.. QuitarItem
+Pedido o-- Acciones
+Pedido*--  ItemPedido
+Pedido --> EstadoItem
+Producto <|-- ProductoUnico
+Producto <|-- Combo
 
-' ========== COCINA Y ESTACIONES ==========
+' ================= Cocina y Estaciones ===============
 
 class Cocina {
   - estaciones: Estacion[]
@@ -178,39 +154,106 @@ enum EstadoEstacion {
   OCUPADA
 }
 
-' ========== RELACIONES ==========
-
-Pedido <|-- PedidoSalon
-Pedido <|-- PedidoEnvio
-PedidoSalon --> Mesa
-
-Pedido  *--  ItemPedido
-Pedido --> EstadoItem
-ItemPedido --> EstadoItem
-ItemPedido --> Producto
-
-Producto <|-- ProductoUnico
-Producto <|-- Combo
-ProductoUnico ..> TipoEstacion
-Combo o--  Producto 
-Combo --> BeneficioCombo
-BeneficioCombo <|.. DescuentoPorcentual
-BeneficioCombo <|.. PrecioFijo
-
-Acciones <|.. AgregarItem
-Acciones <|.. QuitarItem
-Pedido o--  Acciones
-
-Cocina *--  Estacion
-Cocina ..> ProductoUnico 
-Cocina ..> ItemPedido 
-
+ProductoUnico .u.> TipoEstacion
+Estacion --> EstadoEstacion
+Estacion ..> TipoEstacion
+Cocina o--  Estacion
+Cocina ..> ProductoUnico
+Cocina ..> ItemPedido
 Estacion <|-- Parrilla
 Estacion <|-- CocinaFria
 Estacion <|-- Barra
 Estacion <|-- CocinaDulce
-Estacion --> EstadoEstacion
-Estacion ..> TipoEstacion
-Estacion o--  ItemPedido
+Estacion o--  ItemPedido 
+
+' ============= Items ===========
+
+class ItemPedido {
+  - codigo: string
+  - producto: Producto
+  - cantidad: number
+  - estado: EstadoItem
+  - partes: ItemPedido[]
+
+  + getCodigo(): string
+  + getProducto(): Producto
+  + getCantidad(): number
+  + asignarPartes(partes: ItemPedido[]): void
+  + getEstado(): EstadoItem
+  + enPreparacion(): void
+  + listo(): void
+  + puedeModificarse(): boolean
+}
+
+enum EstadoItem {
+  PENDIENTE
+  EN_PREPARACION
+  LISTO
+}
+
+ItemPedido --> EstadoItem
+ItemPedido --> Producto
+
+
+' ========= beneficios ===========
+
+abstract class AplicaBeneficio{
+  - beneficiosDisponibles: Beneficio[]
+
+  + aplicarMayorBeneficio(): Beneficio
+}
+interface Beneficio{
+  + tieneBeneficio(): boolean
+  + calcularPrecio(): number
+  + beneficio(): number
+}
+
+class Combo{
+  - productos: Producto[]
+  - beneficio: BeneficioCombo
+
+  + calcularPrecio(): number
+  + productosDeCocina(): ProductoUnico[]
+}
+
+interface BeneficioCombo {
+  + calcularPrecio(sumaProductos: number): number
+}
+
+class DescuentoPorcentual {
+  - porcentaje: number
+
+  + calcularPrecio(sumaProductos: number): number
+}
+
+Beneficio <|.. BeneficioPorDia
+Beneficio <|.. BeneficioEfectivo
+AplicaBeneficio o-- Beneficio
+Combo --> BeneficioCombo
+Combo o--  Producto 
+BeneficioCombo <|.. DescuentoPorcentual
+BeneficioCombo <|.. PrecioFijo
+
+'========== factura =======
+
+class Factura{
+  - medioDePago: MedioDePago
+  - fecha: Date
+  - totalApagar: number
+  - tieneBeneficio: boolean
+  - pedido: Pedido
+}
+
+enum MedioDePago {
+  EFECTIVO
+  DEBITO
+  CREDITO
+  BILLETERA_VIRTUAL
+}
+
+Factura --> Pedido
+Factura --> MedioDePago
+Factura --> Beneficio
+Factura --> AplicaBeneficio
 
 @enduml
