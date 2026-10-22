@@ -6,17 +6,17 @@ Sistema desarrollado en TypeScript que digitaliza la gestión de pedidos del res
 
 ======= Integrantes ========
 
-Nombre y apellido	                 Usuario de GitHub
+Nombre y apellido	                      Usuario de GitHub
 
-Lucas Fernandez	                     Luem-fern
+Lucas Fernandez	                            Luem-fern
 
-Manuel Aranda	                       ManuAranda04
+Manuel Aranda	                               ManuAranda04
 
-Laszlo Ganduglia	                   Laszlo-GAN
+Laszlo Ganduglia	                           Laszlo-GAN
 
-Maximo Anzuinelli	                   Maximo-anz
+Maximo Anzuinelli	                           Maximo-anz
 
-Matias Padula 	                     TheHysteria5776
+Matias Padula 	                             TheHysteria5776
 
 ======== Qué hace el sistema ==========
 
