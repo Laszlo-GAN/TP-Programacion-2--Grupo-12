@@ -26,7 +26,7 @@ Permite agregar y quitar productos (individuales o combos) mientras el pedido es
 
 Confirma el pedido y reparte sus ítems entre las estaciones de cocina: parrilla, cocina fría, cocina dulce y barra. Un combo con productos de distintas estaciones llega a todas ellas.
 
-Cada estación prepara sus ítems en el orden en que le llegaron y va marcando el avance (`PENDIENTE` → `EN_PREPARACION` → `LISTO`).
+Cada estación prepara sus ítems en el orden en que le llegaron y va marcando el avance (PENDIENTE → EN_PREPARACION → LISTO).
 
 Calcula el precio total del pedido, incluyendo combos con su beneficio (descuento porcentual o precio fijo).
 
@@ -35,7 +35,7 @@ Impide facturar un pedido hasta que todos sus ítems estén listos, y no permite
 ========== Compilación y ejecución ===============
 
 
-El programa de demostración (`src/index.ts`) arma un pedido de salón con seis ítems (incluido un combo), lo confirma, lo reparte entre las estaciones y lo lleva hasta el estado `FINALIZADO`. Parte de la salida:
+El programa de demostración (src/index.ts) arma un pedido de salón con seis ítems (incluido un combo), lo confirma, lo reparte entre las estaciones y lo lleva hasta el estado FINALIZADO. Parte de la salida:
 
 === 1. Armar el pedido ===
    Mesa 5 (4 lugares) - Mozo: Juan
@@ -54,7 +54,5 @@ El programa de demostración (`src/index.ts`) arma un pedido de salón con seis 
 === 5. Intentar modificar el pedido confirmado ===
    Rechazado: El pedido ya fue confirmado: no se puede modificar
 
-======== Pruebas unitarias ============
 
-Ejecuta todas las pruebas con Jest y muestra la cobertura de código por consola. El reporte completo queda en la carpeta `coverage/`.
 
