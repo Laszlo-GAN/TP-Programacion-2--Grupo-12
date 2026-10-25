@@ -1,5 +1,6 @@
 import { ItemPedido } from "./itemPedido";
-import { EstadoEstacion } from "./estadoEstacion";
+import EstacionLibre from "./stateEstacion/estacionLibre";
+import { EstadoEstacion } from "./stateEstacion/estadoEstacion";
 import { TipoEstacion } from "./TipoEstacion";
 
 export abstract class Estacion {
@@ -9,17 +10,38 @@ export abstract class Estacion {
     protected itemActual: ItemPedido | undefined;
     protected estado: EstadoEstacion;
 
-    public constructor(nombre: string, tipo: TipoEstacion, estado: EstadoEstacion) {
+    public constructor(nombre: string, tipo: TipoEstacion) {
         this.nombre = nombre;
         this.tipo = tipo;
         this.colaItems = [];
         this.itemActual = undefined;
-        this.estado = estado;
+        this.estado = new EstacionLibre(this);
     }
 
-  
+    public cambiarEstado(estado: EstadoEstacion): void {
+        this.estado = estado;
+        this.estado.setEstacion(this);
+    }
+
+    public getEstado(): EstadoEstacion {
+        return this.estado;
+    }
+
     public getTipo(): TipoEstacion {
         return this.tipo;
+    }
+    
+    public setItemActual(value: ItemPedido | undefined): void {
+        this.itemActual = value;
+    }
+
+    public getItemActual(): ItemPedido | undefined {
+        return this.itemActual;
+    }
+
+    public procesarItemActual(): ItemPedido | undefined {
+        const siguiente = this.colaItems.shift();
+        return siguiente;
     }
 
     public recibirItems(item: ItemPedido): void {
@@ -28,18 +50,9 @@ export abstract class Estacion {
     }
 
     public procesarSiguiente(): void {
-        if (this.estado === EstadoEstacion.OCUPADA) {
-            return;
-        }
-        const siguiente = this.colaItems.shift();
-        if (siguiente === undefined) {
-            return; 
-        }
-        this.itemActual = siguiente;
-        this.estado = EstadoEstacion.OCUPADA;
-        siguiente.enPreparacion();
+        this.estado.procesarSiguiente();
+        this.estado.ocuparse();
     }
-
    
     public terminarItemActual(): void {
         if (this.itemActual === undefined) {
@@ -47,7 +60,7 @@ export abstract class Estacion {
         }
         this.itemActual.listo();
         this.itemActual = undefined;
-        this.estado = EstadoEstacion.LIBRE;
+        this.estado.liberarse();
         this.procesarSiguiente();
     }
 }
