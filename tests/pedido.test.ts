@@ -1,154 +1,106 @@
 import { Pedido } from "../src/pedidos/pedido";
-import { EstadoItem } from "../src/estacion/estadoItem";
+import { beforeEach, describe, expect, test, jest } from "@jest/globals";
+import { EstadoPedido } from "../src/pedidos/statePedido/estadoPedido";
+import { Cocina } from "../src/estacion/Cocina";
+import PedidoEnConstruccion from "../src/pedidos/statePedido/pedidoEnConstruccion";
+import { estadoPedidoMock, ItemPedidoMock } from "./mocks";
 import { ItemPedido } from "../src/estacion/itemPedido";
-import Combo from "../src/estacion/combo";
-import { DescuentoPorcentual } from "../src/estacion/descuentoPorcentual";
-import { ProductoUnico } from "../src/estacion/productoUnico";
-import { TipoEstacion } from "../src/estacion/TipoEstacion";
-import { PedidoMock, crearItem } from "./mocks";
-import { beforeEach, describe, expect, test } from "@jest/globals";
 
-describe("Test clase Pedido", () => {
-    const PRECIO = 100;
-    const DOS_UNIDADES = 2;
-    const TRES_UNIDADES = 3;
-    const PRECIO_SEGUNDO = 50;
-    const DIEZ_PORCIENTO = 10;
-    let instance: PedidoMock;
+describe("Test de la clase Pedido", () => {
+    class PedidoConcreto extends Pedido {
+        public datosDelPedido(): string {
+            return "Pedido de prueba";
+        }
+    }
+
+    let instance: PedidoConcreto;
+    let ItemPedidoMockConValor: ItemPedido;
 
     beforeEach(() => {
-        instance = new PedidoMock("P001", new Date());
+        ItemPedidoMockConValor = {
+            getProducto: jest.fn().mockReturnValue({ calcularPrecio: jest.fn().mockReturnValue(150)}),
+            getCantidad: jest.fn().mockReturnValue(2),
+            puedeModificarse: jest.fn().mockReturnValue(true)
+        } as unknown as ItemPedido;
+
+        instance = new PedidoConcreto("P001", new Date());
     });
 
-    test("Verificar que sea instancia de Pedido", () => {
+    test("Verifico que sea instancia de Pedido", () => {
         expect(instance).toBeInstanceOf(Pedido);
     });
 
-    test("El estado inicial es PENDIENTE", () => {
-        expect(instance.getEstadoItem()).toBe(EstadoItem.PENDIENTE);
+    test("Verifico que devuelva correctamente su estado", () => {
+        expect(instance.getEstado()).toBeInstanceOf(PedidoEnConstruccion);
     });
 
-    test("El pedido pasa a EN_PREPARACION", () => {
-        instance.enPreparacion();
+    test("Verifico que cambie de estado correctamente", () => {
+        let estadoNuevo: EstadoPedido = {
+            setPedido: jest.fn()
+        } as unknown as EstadoPedido;
+        instance.cambiarEstado(estadoNuevo);
 
-        expect(instance.getEstadoItem()).toBe(EstadoItem.EN_PREPARACION);
+        expect(instance.getEstado()).toEqual(estadoNuevo);
     });
 
-    test("El pedido pasa a LISTO", () => {
-        instance.enListo();
+    test("Verifico que agregue items correctamente", () => {
+        instance.agregarItem(ItemPedidoMockConValor);
 
-        expect(instance.getEstadoItem()).toBe(EstadoItem.LISTO);
+        expect(instance.calcularTotalProductos()).toBe(300);
     });
 
-    test("Devuelve los datos del pedido", () => {
-        expect(instance.datosDelPedido()).toBe("Pedido de prueba");
+    test("Verifico que quite items correctamente,", () => {
+        instance.agregarItem(ItemPedidoMockConValor);
+        instance.quitarItem(ItemPedidoMockConValor);
+
+        expect(instance.calcularTotalProductos()).toBe(0);
     });
 
-    describe("Facturación", () => {
-        test("Con todos los ítems LISTO se puede facturar", () => {
-            const item = crearItem("I001");
-            item.listo();
-            instance.agregarItem(item);
-
-            expect(instance.puedeFacturarse()).toBe(true);
-        });
-
-        test("Con un ítem PENDIENTE no se puede facturar", () => {
-            instance.agregarItem(crearItem("I001"));
-
-            expect(instance.puedeFacturarse()).toBe(false);
-        });
-
-        test("Con un ítem EN_PREPARACION no se puede facturar", () => {
-            const item = crearItem("I001");
-            item.enPreparacion();
-            instance.agregarItem(item);
-
-            expect(instance.puedeFacturarse()).toBe(false);
-        });
-
-        test("Si uno de varios ítems no está listo, no se puede facturar", () => {
-            const listo = crearItem("I001");
-            listo.listo();
-            instance.agregarItem(listo);
-            instance.agregarItem(crearItem("I002"));
-
-            expect(instance.puedeFacturarse()).toBe(false);
-        });
+    test("Verifico que pueda deshacer su útlima modificación", () => {
+        instance.agregarItem(ItemPedidoMockConValor);
+        instance.quitarItem(ItemPedidoMockConValor);
+        
+        instance.deshacerUltimaModificacion();
+        
+        expect(instance.calcularTotalProductos()).toBe(300);
     });
 
-    describe("Total de productos", () => {
-        test("Un pedido sin ítems tiene total 0", () => {
-            expect(instance.calcularTotalProductos()).toBe(0);
-        });
+    test("Verifico que el pedido pueda confirmarse correctamente", () => {
+        const cocinaMock = {
+            enviarItem: jest.fn()
+        } as unknown as Cocina;
 
-        test("El total es la suma de precio por cantidad de cada ítem", () => {
-            instance.agregarItem(crearItem("I001", PRECIO, DOS_UNIDADES));
-            instance.agregarItem(crearItem("I002", PRECIO_SEGUNDO, TRES_UNIDADES));
+        instance.cambiarEstado(estadoPedidoMock);
 
-            expect(instance.calcularTotalProductos()).toBe(PRECIO * DOS_UNIDADES + PRECIO_SEGUNDO * TRES_UNIDADES);
-        });
+        instance.agregarItem(ItemPedidoMock);
+        instance.confirmar(cocinaMock);
 
-        test("El total usa el precio del combo, con su beneficio", () => {
-            const combo = new Combo(
-                [new ProductoUnico(PRECIO, TipoEstacion.PARRILLA), new ProductoUnico(PRECIO, TipoEstacion.BARRA)],
-                new DescuentoPorcentual(DIEZ_PORCIENTO),
-            );
-            instance.agregarItem(new ItemPedido("C001", combo, DOS_UNIDADES));
+        expect(cocinaMock.enviarItem).toHaveBeenCalledWith(ItemPedidoMock);
+        expect(estadoPedidoMock.confirmarPedido).toHaveBeenCalled();
+    })
 
-            expect(instance.calcularTotalProductos()).toBe((PRECIO * DOS_UNIDADES - PRECIO * DOS_UNIDADES / DIEZ_PORCIENTO) * DOS_UNIDADES);
-        });
+    test("Verifico que confirme su facturación correctamente", () => {
+        instance.cambiarEstado(estadoPedidoMock);
+        expect(instance.puedeFacturarse()).toEqual(true);
     });
 
-    describe("Quitar y deshacer", () => {
-        test("Quitar un ítem baja el total", () => {
-            const item = crearItem("I001", PRECIO);
-            instance.agregarItem(item);
+    test("Verifico que pueda finalizar un pedido correctamente", () => {
+        instance.cambiarEstado(estadoPedidoMock);
+        instance.finalizar();
+        expect(estadoPedidoMock.finalizarPedido).toHaveBeenCalled();
+    });
 
-            instance.quitarItem(item);
+    test("Verifico que calcule su total de productos correctamente", () => {
+        instance.agregarItem(ItemPedidoMockConValor);
+        expect(instance.calcularTotalProductos()).toEqual(300);
 
-            expect(instance.calcularTotalProductos()).toBe(0);
-        });
+        instance.quitarItem(ItemPedidoMockConValor);
+        expect(instance.calcularTotalProductos()).toEqual(0);
+    });
 
-        test("Deshacer un quitar vuelve a poner el ítem", () => {
-            const item = crearItem("I001", PRECIO);
-            instance.agregarItem(item);
-            instance.quitarItem(item);
-
-            instance.deshacerUltimaModificacion();
-
-            expect(instance.calcularTotalProductos()).toBe(PRECIO);
-        });
-
-        test("Deshacer un agregar saca el ítem", () => {
-            instance.agregarItem(crearItem("I001", PRECIO));
-
-            instance.deshacerUltimaModificacion();
-
-            expect(instance.calcularTotalProductos()).toBe(0);
-        });
-
-        test("Deshacer sin modificaciones previas no hace nada", () => {
-            instance.deshacerUltimaModificacion();
-
-            expect(instance.calcularTotalProductos()).toBe(0);
-        });
-
-        test("Quitar un ítem que no estaba y deshacer no lo agrega", () => {
-            instance.quitarItem(crearItem("I001", PRECIO));
-
-            instance.deshacerUltimaModificacion();
-
-            expect(instance.calcularTotalProductos()).toBe(0);
-        });
-
-        test("Cada deshacer revierte una sola modificación, de la última a la primera", () => {
-            instance.agregarItem(crearItem("I001", PRECIO));
-            instance.agregarItem(crearItem("I002", PRECIO_SEGUNDO));
-
-            instance.deshacerUltimaModificacion();
-
-            expect(instance.calcularTotalProductos()).toBe(PRECIO);
-        });
+    test("Verifico no pueda lanzar un error al finalizar un pedido no facturable", () => {
+        (estadoPedidoMock.getConfirmarFacturacion as jest.Mock).mockReturnValue(false);
+        
+        expect(() => instance.finalizar()).toThrow("El pedido no se puede finalizar: está sin confirmar o tiene ítems sin terminar");
     });
 });

@@ -1,6 +1,5 @@
 import { Barra } from "../src/estacion/barra";
 import { Estacion } from "../src/estacion/estacion";
-import { EstadoEstacion } from "../src/estacion/estadoEstacion";
 import { TipoEstacion } from "../src/estacion/TipoEstacion";
 import { beforeEach, describe, expect, test } from "@jest/globals";
 
@@ -8,7 +7,7 @@ describe("Test clase Barra", () => {
     let instance: Barra;
 
     beforeEach(() => {
-        instance = new Barra("Barra 1", EstadoEstacion.LIBRE);
+        instance = new Barra("Barra 1");
     });
 
     test("Verificar que sea instancia de Barra", () => {

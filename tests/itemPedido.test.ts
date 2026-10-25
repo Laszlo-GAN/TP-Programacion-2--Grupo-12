@@ -1,105 +1,106 @@
-import { EstadoItem } from "../src/estacion/estadoItem";
 import { ItemPedido } from "../src/estacion/itemPedido";
-import { ProductoUnico } from "../src/estacion/productoUnico";
-import { TipoEstacion } from "../src/estacion/TipoEstacion";
-import { beforeEach, describe, expect, test } from "@jest/globals";
+import { EstadoItem } from "../src/estacion/stateItem/estadoItem";
+import { ItemEnPreparacion } from "../src/estacion/stateItem/itemEnPreparacion";
+import { ItemListo } from "../src/estacion/stateItem/itemListo";
+import { ItemPendiente } from "../src/estacion/stateItem/itemPendiente";
+import { beforeEach, describe, expect, test, jest } from "@jest/globals";
+import { estadoItemMock, ProductoMock } from "./mocks";
 
 describe("Test clase ItemPedido", () => {
-    const CANTIDAD = 3;
-    const PRECIO = 100;
-    let instance: ItemPedido;
-    let producto: ProductoUnico;
+    class ItemPedidoConcreto extends ItemPedido { }
+    let instance: ItemPedidoConcreto;
 
     beforeEach(() => {
-        producto = new ProductoUnico(PRECIO, TipoEstacion.PARRILLA);
-        instance = new ItemPedido("Item1", producto, CANTIDAD);
+        instance = new ItemPedidoConcreto("I001", ProductoMock, 2);
+    })
+
+    test("Verifico que la clase sea una instancia de ItemPedido", () => {
+        expect(instance).toBeInstanceOf(ItemPedido)
     });
 
-    test("Verificar que sea instancia de ItemPedido", () => {
-        expect(instance).toBeInstanceOf(ItemPedido);
+    test("Verifico que la clase se instancie en estado Pendiente", () => {
+        expect(instance.getEstado()).toBeInstanceOf(ItemPendiente);
+    })
+
+    test("Verifico que se cambie correctamente el estado del Item Pedido", () => {
+        let nuevoEstado: EstadoItem;
+        nuevoEstado = {
+            setItemPedido: jest.fn()
+        } as unknown as EstadoItem;
+
+        instance.cambiarEstado(nuevoEstado);
+        expect(instance.getEstado()).toEqual(nuevoEstado);
     });
 
-    test("Verificar que devuelva el código", () => {
-        expect(instance.getCodigo()).toBe("Item1");
+    test("Verifico que mantenga su estado si no tiene partes", () => {
+        instance.cambiarEstado(estadoItemMock);
+        instance.actualizarEstadoSegunPartes();
+        expect(instance.getEstado()).toEqual(estadoItemMock);
     });
 
-    test("Verificar que devuelva el producto", () => {
-        expect(instance.getProducto()).toBe(producto);
+    test("Verifico que se actualize su estado a Listo según sus partes", () => {
+        const parteMock = {
+            setPadre: jest.fn(),
+            getEstado: jest.fn().mockReturnValue({
+                getEstaListo: jest.fn().mockReturnValue(true),
+                getEstaPendiente: jest.fn().mockReturnValue(false)
+            })
+        } as unknown as ItemPedido;
+
+        instance.asignarPartes([parteMock]);
+        instance.actualizarEstadoSegunPartes();
+
+        instance.actualizarEstadoSegunPartes()
+        expect(instance.getEstado()).toBeInstanceOf(ItemListo);
     });
 
-    test("Verificar que devuelva la cantidad", () => {
-        expect(instance.getCantidad()).toBe(CANTIDAD);
+    test("Verifico que se actualize su estado a Pendiente según sus partes", () => {
+        const parteMock = {
+            setPadre: jest.fn(),
+            getEstado: jest.fn().mockReturnValue({
+                getEstaListo: jest.fn().mockReturnValue(false),
+                getEstaPendiente: jest.fn().mockReturnValue(true)
+            })
+        } as unknown as ItemPedido;
+
+        instance.asignarPartes([parteMock]);
+        instance.actualizarEstadoSegunPartes();
+
+        expect(instance.getEstado()).toBeInstanceOf(ItemPendiente);
     });
 
-    test("Un ítem nuevo está PENDIENTE", () => {
-        expect(instance.getEstado()).toBe(EstadoItem.PENDIENTE);
+    test("Verifico que mantenga su estado si hay mezcla de estados en sus partes", () => {
+        const parteMock = {
+            setPadre: jest.fn(),
+            getEstado: jest.fn().mockReturnValue({
+                getEstaListo: jest.fn().mockReturnValue(false),
+                getEstaPendiente: jest.fn().mockReturnValue(false)
+            })
+        } as unknown as ItemPedido;
+
+        instance.asignarPartes([parteMock]);
+        instance.actualizarEstadoSegunPartes();
+
+        expect(instance.getEstado()).toBeInstanceOf(ItemEnPreparacion);
     });
 
-    test("Un ítem pendiente puede modificarse", () => {
-        expect(instance.puedeModificarse()).toBe(true);
-    });
-
-    test("El ítem pasa a EN_PREPARACION", () => {
+    test("Verifico que el item pase a prepararse correctamente", () => {
+        instance.cambiarEstado(estadoItemMock)
         instance.enPreparacion();
 
-        expect(instance.getEstado()).toBe(EstadoItem.EN_PREPARACION);
+        expect(estadoItemMock.enPreparacion).toHaveBeenCalled();
     });
 
-    test("Un ítem en preparación no puede modificarse", () => {
-        instance.enPreparacion();
-
-        expect(instance.puedeModificarse()).toBe(false);
-    });
-
-    test("El ítem pasa a LISTO", () => {
+    test("Verifico que el item se termine correctamente", () => {
+        instance.cambiarEstado(estadoItemMock)
         instance.listo();
 
-        expect(instance.getEstado()).toBe(EstadoItem.LISTO);
+        expect(estadoItemMock.listo).toHaveBeenCalled();
     });
 
-    test("Un ítem listo no puede modificarse", () => {
-        instance.listo();
+    test("Verifico que se delegue correctamente la confirmación de modificación según su estado", () => {
+        instance.puedeModificarse();
 
-        expect(instance.puedeModificarse()).toBe(false);
-    });
-
-    describe("Ítem repartido en varias partes (combo)", () => {
-        let primera: ItemPedido;
-        let segunda: ItemPedido;
-
-        beforeEach(() => {
-            primera = new ItemPedido("Item1", producto, CANTIDAD);
-            segunda = new ItemPedido("Item1", producto, CANTIDAD);
-            instance.asignarPartes([primera, segunda]);
-        });
-
-        test("Con todas las partes pendientes, está PENDIENTE", () => {
-            expect(instance.getEstado()).toBe(EstadoItem.PENDIENTE);
-        });
-
-        test("Con una parte en preparación, está EN_PREPARACION", () => {
-            primera.enPreparacion();
-
-            expect(instance.getEstado()).toBe(EstadoItem.EN_PREPARACION);
-        });
-
-        test("Con una parte lista y otra pendiente, está EN_PREPARACION", () => {
-            primera.listo();
-
-            expect(instance.getEstado()).toBe(EstadoItem.EN_PREPARACION);
-        });
-
-        test("Con todas las partes listas, está LISTO", () => {
-            primera.listo();
-            segunda.listo();
-
-            expect(instance.getEstado()).toBe(EstadoItem.LISTO);
-        });
-
-        test("Si alguna parte ya empezó, no puede modificarse", () => {
-            primera.enPreparacion();
-
-            expect(instance.puedeModificarse()).toBe(false);
-        });
+        expect(estadoItemMock.confirmarModificacion).toHaveBeenCalled;
     });
 });

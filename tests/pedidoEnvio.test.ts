@@ -1,6 +1,5 @@
 import { PedidoEnvio } from "../src/pedidos/pedidoEnvio";
 import { Pedido } from "../src/pedidos/pedido";
-import { EstadoItem } from "../src/estacion/estadoItem";
 import { beforeEach, describe, expect, test } from "@jest/globals";
 
 describe("Test clase PedidoEnvio", () => {
@@ -17,10 +16,6 @@ describe("Test clase PedidoEnvio", () => {
 
     test("Verificar que sea un Pedido", () => {
         expect(instance).toBeInstanceOf(Pedido);
-    });
-
-    test("El estado inicial es PENDIENTE", () => {
-        expect(instance.getEstadoItem()).toBe(EstadoItem.PENDIENTE);
     });
 
     test("Los datos incluyen la dirección y el costo de envío", () => {
