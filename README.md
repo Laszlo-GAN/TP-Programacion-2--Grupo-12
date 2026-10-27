@@ -1,12 +1,12 @@
-Fogón del Barrio – Gestión de pedidos de un restaurante
+****Fogón del Barrio – Gestión de pedidos de un restaurante****
 
-Trabajo práctico de Programación II – Grupo 12.
+**Trabajo práctico de Programación II – Grupo 12.**
 
 Sistema desarrollado en TypeScript que digitaliza la gestión de pedidos del restaurante "Fogón del Barrio": desde que se toma un pedido hasta que la cocina termina de prepararlo y queda listo para cobrar.
 
-======= Integrantes ========
+***======= Integrantes ========***
 
-Nombre y apellido	                 Usuario de GitHub
+**Nombre y apellido	                 Usuario de GitHub**
 
 Lucas Fernandez	                     Luem-fern
 Manuel Aranda	                       ManuAranda04
@@ -14,7 +14,7 @@ Laszlo Ganduglia	                   Laszlo-GAN
 Maximo Anzuinelli	                   Maximo-anz
 Matias Padula 	                     TheHysteria5776
 
-======== Qué hace el sistema ==========
+***======== Qué hace el sistema ==========***
 
 Registra pedidos de salón (con mesa, lugares y mozo) y de envío (con dirección y costo de envío).
 
@@ -28,7 +28,7 @@ Calcula el precio total del pedido, incluyendo combos con su beneficio (descuent
 
 Impide facturar un pedido hasta que todos sus ítems estén listos, y no permite modificar un pedido ya confirmado ni un ítem que está en preparación.
 
-========== Compilación y ejecución ===============
+***========== Compilación y ejecución ===============***
 
 
 El programa de demostración (`src/index.ts`) arma un pedido de salón con seis ítems (incluido un combo), lo confirma, lo reparte entre las estaciones y lo lleva hasta el estado `FINALIZADO`. Parte de la salida:
@@ -50,7 +50,7 @@ El programa de demostración (`src/index.ts`) arma un pedido de salón con seis 
 === 5. Intentar modificar el pedido confirmado ===
    Rechazado: El pedido ya fue confirmado: no se puede modificar
 
-======== Pruebas unitarias ============
+***======== Pruebas unitarias ============***
 
 Ejecuta todas las pruebas con Jest y muestra la cobertura de código por consola. El reporte completo queda en la carpeta `coverage/`.
 

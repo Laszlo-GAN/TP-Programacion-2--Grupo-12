@@ -5,7 +5,7 @@ import { ProductoUnico } from "../src/estacion/productoUnico";
 import { TipoEstacion } from "../src/estacion/TipoEstacion";
 import { Pedido } from "../src/pedidos/pedido";
 
-
+// Estacion no tiene getters para su estado interno: el mock los agrega para poder verificarlos
 export class EstacionMock extends Estacion {
     public constructor(nombre: string, estado: EstadoEstacion) {
         super(nombre, TipoEstacion.PARRILLA, estado);
@@ -30,7 +30,7 @@ export class PedidoMock extends Pedido {
     }
 }
 
-
+// Arma un ítem real (de parrilla) para no repetir código en cada test
 export function crearItem(codigo: string, precio: number = 100, cantidad: number = 1): ItemPedido {
     return new ItemPedido(codigo, new ProductoUnico(precio, TipoEstacion.PARRILLA), cantidad);
 }
