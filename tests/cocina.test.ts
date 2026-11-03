@@ -134,6 +134,9 @@ describe("Test clase Cocina", () => {
             parrilla.terminarItemActual();
             dulce.terminarItemActual();
             expect(combo.getEstado()).toBeInstanceOf(ItemEnPreparacion);
+
+            // la Barra seguía con la gaseosa de antes: el combo todavía no puede estar listo
+            expect(combo.getEstado()).toBe(EstadoItem.EN_PREPARACION);
         });
     });
 });

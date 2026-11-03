@@ -49,6 +49,19 @@ describe("Test acciones sobre la lista de ítems", () => {
             expect(items).toEqual([item]);
         });
 
+        test("Deshacer devuelve el ítem a su posición original", () => {
+            const primero = crearItem("I001");
+            const segundo = crearItem("I002");
+            const tercero = crearItem("I003");
+            items.push(primero, segundo, tercero);
+            const accion = new QuitarItem(items, segundo);
+            accion.aplicar();
+
+            accion.deshacer();
+
+            expect(items).toEqual([primero, segundo, tercero]);
+        });
+
         test("Si el ítem no estaba, aplicar y deshacer no cambian la lista", () => {
             const accion = new QuitarItem(items, item);
 
