@@ -27,10 +27,28 @@ abstract class Pedido {
   - verificarEnConstruccion(): void
 }
 
-enum EstadoPedido {
-  EN_CONSTRUCCION
-  CONFIRMADO
-  FINALIZADO
+abstract class EstadoPedido {
+  # pedido: Pedido
+  # confirmarFacturacion: boolean
+  # confirmarModificacion: boolean
+
+  + setPedido(pedido: Pedido)
+  + confirmarFacturacion(): void
+  + confirmarModificacion(): void
+  + abstract finalizarPedido(): void
+  + abstract confirmarPedido(): void
+}
+
+class PedidoEnConstruccion {
+
+}
+
+class PedidoConfirmado {
+
+}
+
+class PedidoFinalizado {
+
 }
 
 class Mesa {
@@ -63,6 +81,9 @@ class PedidoEnvio{
 Pedido <|-- PedidoSalon
 Pedido <|-- PedidoRetirar
 Pedido <|-- PedidoEnvio
+EstadoPedido <|-- PedidoConfirmado
+EstadoPedido <|-- PedidoEnConstruccion
+EstadoPedido <|-- PedidoFinalizado
 PedidoSalon --> Mesa
 
 ' ============== PRODUCTO ===========
@@ -123,7 +144,7 @@ Acciones <|.. AgregarItem
 Acciones <|.. QuitarItem
 Pedido o-- Acciones 
 Pedido  *--  ItemPedido
-Pedido --> EstadoPedido
+Pedido *--> EstadoPedido
 Pedido ..> Cocina 
 Producto <|-- ProductoUnico
 Producto <|-- Combo
@@ -141,10 +162,12 @@ abstract class Estacion {
   # nombre: string
   # tipo: TipoEstacion
   # colaItems: ItemPedido[]
-  # itemActual: ItemPedido
+  # itemActual: ItemPedido | undefined
   # estado: EstadoEstacion
 
+  + cambiarEstado(estado: EstadoEstacion): void
   + getTipo(): TipoEstacion
+  + procesarItemActual(): void
   + recibirItems(item: ItemPedido): void
   + procesarSiguiente(): void
   + terminarItemActual(): void
@@ -158,13 +181,27 @@ class Barra {}
 
 class CocinaDulce {}
 
-enum EstadoEstacion {
-  LIBRE
-  OCUPADA
+abstract class EstadoEstacion {
+  # estacion: Estacion
+
+  + setEstacion(estacion: Estacion)
+  + abstract ocuparse(): void
+  + abstract liberarse(): void
+  + abstract procesarSiguiente(): void
+}
+
+class EstacionLibre {
+
+}
+
+class EstacionOcupada {
+
 }
 
 ProductoUnico .u.> TipoEstacion
-Estacion --> EstadoEstacion
+Estacion *--> EstadoEstacion
+EstadoEstacion <|-- EstacionLibre
+EstadoEstacion <|-- EstacionOcupada
 Estacion ..> TipoEstacion
 Cocina o--  Estacion
 Cocina ..> ProductoUnico 
@@ -182,27 +219,46 @@ class ItemPedido {
   - producto: Producto
   - cantidad: number
   - estado: EstadoItem
+  - padre!: ItemPedido
   - partes: ItemPedido[]
 
-  + getCodigo(): string
-  + getProducto(): Producto
-  + getCantidad(): number
+  + cambiarEstado(estado: EstadoItem)
+  + setPadre(padre: ItemPedido): void
   + asignarPartes(partes: ItemPedido[]): void
-  + getEstado(): EstadoItem
+  + actualizarEstadoSegunPartes(): void
   + enPreparacion(): void
   + listo(): void
   + puedeModificarse(): boolean
 }
 
-enum EstadoItem {
-  PENDIENTE
-  EN_PREPARACION
-  LISTO
+abstract class EstadoItem {
+  # itemPedido: ItemPedido
+  # puedeModificarse: boolean
+  # estaListo: boolean
+  # estaEnPreparacion: boolean
+  # estaPendiente: boolean
+
+  + setItemPedido(itemPedido: ItemPedido): void
+  + confirmarModificacion(): boolean
+  + abstract listo(): void
+  + abstract enPreparacion(): void
 }
 
-ItemPedido --> EstadoItem
-ItemPedido --> Producto
+class ItemPendiente {
 
+}
+
+class ItemEnPreparacion {
+
+}
+
+class ItemListo
+
+ItemPedido *--> EstadoItem
+ItemPedido --> Producto
+EstadoItem <|-- ItemEnPreparacion
+EstadoItem <|-- ItemListo
+EstadoItem <|-- ItemPendiente
 
 ' ========= beneficios ===========
 

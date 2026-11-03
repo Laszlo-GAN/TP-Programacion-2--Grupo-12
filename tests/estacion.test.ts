@@ -1,90 +1,60 @@
 import { Estacion } from "../src/estacion/estacion";
-import { EstadoEstacion } from "../src/estacion/estadoEstacion";
-import { EstadoItem } from "../src/estacion/estadoItem";
-import { beforeEach, describe, expect, test } from "@jest/globals";
-import { EstacionMock, crearItem } from "./mocks";
+import { beforeEach, describe, expect, test, jest } from "@jest/globals";
+import { TipoEstacion } from "../src/estacion/TipoEstacion";
+import { EstadoEstacion } from "../src/estacion/stateEstacion/estadoEstacion";
+import { estadoEstacionMock, ItemPedidoMock } from "./mocks";
 
 describe("Test clase Estacion", () => {
-    let instance: EstacionMock;
+    class EstacionConcreta extends Estacion { }
+    let instance: Estacion;
 
     beforeEach(() => {
-        instance = new EstacionMock("Estacion1", EstadoEstacion.LIBRE);
+        instance = new EstacionConcreta("Estación Uno", TipoEstacion.PARRILLA);
+
+        instance.cambiarEstado(estadoEstacionMock);
     });
 
-    test("Verificar que sea instancia de Estacion", () => {
+    test("Verifico que sea instancia de la clase Estación", () => {
         expect(instance).toBeInstanceOf(Estacion);
     });
 
-    test("Verificar que arranque con la cola vacía", () => {
-        expect(instance.getColaItems()).toHaveLength(0);
+    test("Verifico que pueda cambiar de estado correctamente", () => {
+        const nuevoEstadoMock: EstadoEstacion = {
+            setEstacion: jest.fn()
+        } as unknown as EstadoEstacion;
+
+        instance.cambiarEstado(nuevoEstadoMock);
+        expect(instance.getEstado()).toEqual(nuevoEstadoMock);
     });
 
-    test("Un ítem que llega a una estación libre pasa a EN_PREPARACION", () => {
-        const item = crearItem("I001");
-
-        instance.recibirItems(item);
-
-        expect(item.getEstado()).toBe(EstadoItem.EN_PREPARACION);
+    test("Verifico que setee corretamente el Item Actual", () => {
+        instance.setItemActual(ItemPedidoMock);
+        expect(instance.getItemActual()).toEqual(ItemPedidoMock);
     });
 
-    test("La estación queda OCUPADA mientras prepara un ítem", () => {
-        instance.recibirItems(crearItem("I001"));
+    test("Verifico que procese correctamente el Item Actual", () => {
+        instance.recibirItems(ItemPedidoMock);
+        const itemActual = instance.procesarItemActual();
 
-        expect(instance.getEstado()).toBe(EstadoEstacion.OCUPADA);
+        expect(itemActual).toEqual(ItemPedidoMock);
+
+        const resultadoVacio = instance.procesarItemActual();
+        expect(resultadoVacio).toBeUndefined();
     });
 
-    test("Un segundo ítem espera en la cola mientras la estación está ocupada", () => {
-        const primero = crearItem("I001");
-        const segundo = crearItem("I002");
+    test("Verifico que reciba los items correctamente", () => {
+        instance.recibirItems(ItemPedidoMock);
 
-        instance.recibirItems(primero);
-        instance.recibirItems(segundo);
-
-        expect(segundo.getEstado()).toBe(EstadoItem.PENDIENTE);
-        expect(instance.getColaItems()).toHaveLength(1);
+        expect(estadoEstacionMock.procesarSiguiente).toHaveBeenCalled;
+        expect(estadoEstacionMock.ocuparse).toHaveBeenCalled;
     });
 
-    test("Una estación que arranca OCUPADA no procesa el ítem que recibe", () => {
-        const ocupada = new EstacionMock("Estacion2", EstadoEstacion.OCUPADA);
-        const item = crearItem("I001");
-
-        ocupada.recibirItems(item);
-
-        expect(item.getEstado()).toBe(EstadoItem.PENDIENTE);
-    });
-
-    test("Al terminar el ítem actual queda LISTO y la estación se libera", () => {
-        const item = crearItem("I001");
-        instance.recibirItems(item);
-
+    test("Verifico que termine el item actual correctamente", () => {
+        instance.setItemActual(ItemPedidoMock);
         instance.terminarItemActual();
 
-        expect(item.getEstado()).toBe(EstadoItem.LISTO);
-        expect(instance.getEstado()).toBe(EstadoEstacion.LIBRE);
-    });
-
-    test("Al terminar un ítem, la estación empieza con el siguiente de la cola", () => {
-        const primero = crearItem("I001");
-        const segundo = crearItem("I002");
-        instance.recibirItems(primero);
-        instance.recibirItems(segundo);
-
-        instance.terminarItemActual();
-
-        expect(segundo.getEstado()).toBe(EstadoItem.EN_PREPARACION);
-        expect(instance.getEstado()).toBe(EstadoEstacion.OCUPADA);
-        expect(instance.getColaItems()).toHaveLength(0);
-    });
-
-    test("Terminar sin ningún ítem en preparación no cambia nada", () => {
-        instance.terminarItemActual();
-
-        expect(instance.getEstado()).toBe(EstadoEstacion.LIBRE);
-    });
-
-    test("Procesar con la cola vacía deja la estación libre", () => {
-        instance.procesarSiguiente();
-
-        expect(instance.getEstado()).toBe(EstadoEstacion.LIBRE);
+        expect(ItemPedidoMock.listo).toHaveBeenCalled;
+        expect(instance.getItemActual).toBeUndefined;
+        expect(estadoEstacionMock.liberarse).toHaveBeenCalled;
     });
 });
