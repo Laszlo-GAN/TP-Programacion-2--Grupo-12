@@ -1,14 +1,13 @@
-import { CocinaFria } from "../src/estacion/cocinaFrea";
+import { CocinaFria } from "../src/estacion/cocinaFria";
 import { Estacion } from "../src/estacion/estacion";
-import { EstadoEstacion } from "../src/estacion/estadoEstacion";
 import { TipoEstacion } from "../src/estacion/TipoEstacion";
-import { beforeEach, describe, expect, test } from "@jest/globals";
+import { beforeEach, describe, expect, test, jest } from "@jest/globals";
 
 describe("Test clase CocinaFria", () => {
     let instance: CocinaFria;
 
     beforeEach(() => {
-        instance = new CocinaFria("CocinaFria 1", EstadoEstacion.LIBRE);
+        instance = new CocinaFria("CocinaFria 1");
     });
 
     test("Verificar que sea instancia de CocinaFria", () => {

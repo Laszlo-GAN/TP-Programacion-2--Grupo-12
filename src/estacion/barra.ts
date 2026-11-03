@@ -1,9 +1,8 @@
 import { Estacion } from "./estacion";
-import { EstadoEstacion } from "./estadoEstacion";
 import { TipoEstacion } from "./TipoEstacion";
 
 export class Barra extends Estacion {
-    public constructor(nombre: string, estado: EstadoEstacion) {
-        super(nombre, TipoEstacion.BARRA, estado);
+    public constructor(nombre: string) {
+        super(nombre, TipoEstacion.BARRA);
     }
 }

@@ -1,10 +1,10 @@
 import { Cocina } from "../estacion/Cocina";
-import { EstadoItem } from "../estacion/estadoItem";
 import { ItemPedido } from "../estacion/itemPedido";
 import { Acciones } from "./acciones";
 import { AgregarItem } from "./agregarItem";
-import { EstadoPedido } from "./estadoPedido";
+import { EstadoPedido } from "./statePedido/estadoPedido";
 import { QuitarItem } from "./quitarItem";
+import PedidoEnConstruccion from "./statePedido/pedidoEnConstruccion";
 
 const SIN_ITEMS = 0;
 
@@ -18,16 +18,20 @@ export abstract class Pedido {
     public constructor(codigo: string, fechaHora: Date) {
         this.codigo = codigo;
         this.fechaHora = fechaHora;
-        this.estado = EstadoPedido.EN_CONSTRUCCION;
+        this.estado = new PedidoEnConstruccion(this);
         this.items = [];
         this.historial = [];
     }
-
    
     public abstract datosDelPedido(): string;
 
     public getEstado(): EstadoPedido {
         return this.estado;
+    }
+
+    public cambiarEstado(estado: EstadoPedido): void {
+        this.estado = estado;
+        this.estado.setPedido(this)
     }
 
     public agregarItem(item: ItemPedido): void {
@@ -56,37 +60,34 @@ export abstract class Pedido {
         ultima.deshacer();
     }
 
-    //
     public confirmar(cocina: Cocina): void {
-        this.verificarEnConstruccion();
+        if(!this.verificarEnConstruccion()) {
+            return
+        }
+        
         if (this.items.length === SIN_ITEMS) {
             throw new Error("No se puede confirmar un pedido sin ítems");
         }
         for (const item of this.items) {
             cocina.enviarItem(item);
         }
-        this.estado = EstadoPedido.CONFIRMADO;
+        this.estado.confirmarPedido();
     }
-
    
     public puedeFacturarse(): boolean {
-        if (this.estado !== EstadoPedido.CONFIRMADO) {
-            return false;
-        }
         for (const item of this.items) {
-            if (item.getEstado() !== EstadoItem.LISTO) {
+            if (!item.puedeModificarse()) {
                 return false;
             }
         }
-        return true;
+        return this.estado.getConfirmarFacturacion();
     }
 
-   
     public finalizar(): void {
         if (!this.puedeFacturarse()) {
             throw new Error("El pedido no se puede finalizar: está sin confirmar o tiene ítems sin terminar");
         }
-        this.estado = EstadoPedido.FINALIZADO;
+        this.estado.finalizarPedido();
     }
 
     public calcularTotalProductos(): number {
@@ -97,10 +98,7 @@ export abstract class Pedido {
         return total;
     }
 
-   
-    private verificarEnConstruccion(): void {
-        if (this.estado !== EstadoPedido.EN_CONSTRUCCION) {
-            throw new Error("El pedido ya fue confirmado: no se puede modificar");
-        }
+    private verificarEnConstruccion(): boolean {
+        return this.estado.getConfirmarModificacion();
     }
 }
