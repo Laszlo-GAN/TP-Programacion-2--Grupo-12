@@ -9,9 +9,7 @@ export abstract class Producto {
         this.categoria = "";
     }
 
-   
     public abstract calcularPrecio(): number;
-
     
     public abstract productosDeCocina(): ProductoUnico[];
 }
