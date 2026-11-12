@@ -5,11 +5,10 @@ import { ItemEnPreparacion } from "./itemEnPreparacion";
 export class ItemPendiente extends EstadoItem {
     public constructor(itemPedido: ItemPedido) {
         super(itemPedido);
+        this.nombre = "PENDIENTE";
         this.puedeModificarse = true;
         this.estaPendiente = true;
-    }
-    public listo(): void {
-        throw new Error("El item aún no fue preparado");
+        this.motivoNoPuedeTerminarse = "El item aún no fue preparado";
     }
 
     public enPreparacion(): void {

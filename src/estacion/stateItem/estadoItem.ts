@@ -6,6 +6,9 @@ export abstract class EstadoItem {
     protected estaListo: boolean;
     protected estaEnPreparacion: boolean;
     protected estaPendiente: boolean;
+    protected motivoNoPuedeTerminarse: string;
+    protected motivoNoPuedePrepararse: string;
+    protected nombre: string;
 
     public constructor(itemPedido: ItemPedido) {
         this.itemPedido = itemPedido;
@@ -13,6 +16,13 @@ export abstract class EstadoItem {
         this.estaListo = false;
         this.estaEnPreparacion = false;
         this.estaPendiente = false;
+        this.nombre = ""
+        this.motivoNoPuedePrepararse = "El item ya esta en preparacion";
+        this.motivoNoPuedeTerminarse = "El item no fuee terminado aun";
+    }
+
+    public getNombre(): string{
+        return this.nombre;
     }
 
     public setItemPedido(itemPedido: ItemPedido): void {
@@ -39,7 +49,11 @@ export abstract class EstadoItem {
         return this.estaPendiente;
     }
 
-    public abstract listo(): void;
+    public listo(): void{
+        throw new Error(this.motivoNoPuedeTerminarse);
+    }
     
-    public abstract enPreparacion(): void;
+    public enPreparacion(): void{
+        throw new Error(this.motivoNoPuedePrepararse);
+    }
 }

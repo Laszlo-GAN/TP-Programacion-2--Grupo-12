@@ -61,9 +61,7 @@ export abstract class Pedido {
     }
 
     public confirmar(cocina: Cocina): void {
-        if(!this.verificarEnConstruccion()) {
-            return
-        }
+        this.verificarEnConstruccion();
         
         if (this.items.length === SIN_ITEMS) {
             throw new Error("No se puede confirmar un pedido sin ítems");
@@ -75,12 +73,15 @@ export abstract class Pedido {
     }
    
     public puedeFacturarse(): boolean {
+        if (!this.estado.getConfirmarFacturacion()) {
+            return false;
+        }
         for (const item of this.items) {
-            if (!item.puedeModificarse()) {
+            if (!item.getEstado().getEstaListo()) {
                 return false;
             }
         }
-        return this.estado.getConfirmarFacturacion();
+        return true;
     }
 
     public finalizar(): void {
@@ -97,8 +98,10 @@ export abstract class Pedido {
         }
         return total;
     }
-
-    private verificarEnConstruccion(): boolean {
-        return this.estado.getConfirmarModificacion();
+    private verificarEnConstruccion(): void {
+        if (!this.estado.getConfirmarModificacion()) {
+            throw new Error("El pedido ya no está en construcción: no se puede modificar");
+        }
     }
+    
 }

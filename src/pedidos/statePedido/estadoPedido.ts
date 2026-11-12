@@ -4,11 +4,21 @@ export abstract class EstadoPedido {
     protected pedido: Pedido;
     protected confirmarFacturacion: boolean;
     protected confirmarModificacion: boolean;
+    protected motivoNoPuedeFinalizarse: string;
+    protected motivoNoPuedeConfirmarse: string;
+    protected nombre: string;
 
     public constructor(pedido: Pedido) {
-        this.pedido = pedido;
-        this.confirmarFacturacion = false
+       this.pedido = pedido;
+        this.nombre = "";
+        this.confirmarFacturacion = false;
         this.confirmarModificacion = false;
+        this.motivoNoPuedeFinalizarse = "El pedido no puede finalizarse";
+        this.motivoNoPuedeConfirmarse = "El pedido no puede confirmarse";
+    }
+
+    public getNombre(): string {
+        return this.nombre;
     }
 
     public setPedido(pedido: Pedido): void {
@@ -27,7 +37,11 @@ export abstract class EstadoPedido {
         return this.confirmarModificacion;
     };
 
-    public abstract finalizarPedido(): void;
-
-    public abstract confirmarPedido(): void;
+     public finalizarPedido(): void {
+        throw new Error(this.motivoNoPuedeFinalizarse);
+    }
+ 
+    public confirmarPedido(): void {
+        throw new Error(this.motivoNoPuedeConfirmarse);
+    }
 }

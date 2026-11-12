@@ -5,13 +5,12 @@ import { ItemListo } from "./itemListo";
 export class ItemEnPreparacion extends EstadoItem {
     public constructor(itemPedido: ItemPedido) {
         super(itemPedido);
+        this.nombre = "EN_PREPARACION";
         this.estaEnPreparacion = true;
-    }
-    public listo(): void {
-        this.itemPedido.cambiarEstado(new ItemListo(this.itemPedido));
+        this.motivoNoPuedePrepararse = "El item ya esta en preparación";
     }
 
-    public enPreparacion(): void {
-        throw new Error("El item ya esta en preparación");
+    public listo(): void {
+        this.itemPedido.cambiarEstado(new ItemListo(this.itemPedido));
     }
 }
