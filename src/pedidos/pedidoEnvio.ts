@@ -1,4 +1,7 @@
 import { Pedido } from "./pedido";
+import { ItemFactura } from "../facturacion/ItemFactura";
+
+const UNA_UNIDAD = 1;
 
 export class PedidoEnvio extends Pedido {
     private direccion: string;
@@ -11,6 +14,21 @@ export class PedidoEnvio extends Pedido {
     }
 
     public datosDelPedido(): string {
-        return `Envío a ${this.direccion} (costo de envío: $${this.costoEnvio})`;
+        return `Su Pedido sera enviado a ${this.direccion}, El envio sale: $${this.costoEnvio} .gracias por su compra.`;
+    }
+
+    public override obtenerItemsParaFactura(): ItemFactura[] {
+        const itemsFactura = super.obtenerItemsParaFactura();
+        itemsFactura.push({
+            descripcion: "Costo de envío",
+            cantidad: UNA_UNIDAD,
+            precioUnitario: this.costoEnvio,
+            subtotal: this.costoEnvio,
+        });
+        return itemsFactura;
+    }
+
+    public override calcularTotal(): number {
+        return this.calcularTotalProductos() + this.costoEnvio;        
     }
 }

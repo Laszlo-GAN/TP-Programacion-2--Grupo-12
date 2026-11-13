@@ -8,8 +8,8 @@ export default class Combo extends Producto {
     private productos: Producto[];
     private beneficio: BeneficioCombo;
 
-    public constructor(productos: Producto[], beneficio: BeneficioCombo) {
-        super();
+    public constructor(productos: Producto[], beneficio: BeneficioCombo, nombre: string = "Combo") {
+        super(nombre);
         if (productos.length < MINIMO_PRODUCTOS) {
             throw new Error("Un combo necesita al menos dos productos");
         }

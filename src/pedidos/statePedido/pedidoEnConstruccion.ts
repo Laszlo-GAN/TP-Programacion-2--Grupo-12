@@ -5,15 +5,9 @@ import PedidoConfirmado from "./pedidoConfirmado";
 export default class PedidoEnConstruccion extends EstadoPedido {
     public constructor(pedido: Pedido) {
         super(pedido);
+        this.nombre = "EN_CONSTRUCCION";
         this.confirmarModificacion = true;
-    }
-
-    public getConfirmarModificacion(): boolean {
-        return this.confirmarModificacion;
-    }
-
-    public finalizarPedido(): void {
-        throw new Error("El pedido aún esta en construcción y no puede finalizarse.");
+        this.motivoNoPuedeFinalizarse = "El pedido aún esta en construcción y no puede finalizarse.";
     }
 
     public confirmarPedido(): void {

@@ -50,10 +50,11 @@ export abstract class Estacion {
     }
 
     public procesarSiguiente(): void {
-        this.estado.procesarSiguiente();
-        this.estado.ocuparse();
+        if (this.estado.estaDisponible()) {
+            this.estado.procesarSiguiente();
+        }
     }
-   
+    
     public terminarItemActual(): void {
         if (this.itemActual === undefined) {
             return;

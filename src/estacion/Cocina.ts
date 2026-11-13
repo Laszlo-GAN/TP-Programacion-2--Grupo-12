@@ -12,17 +12,26 @@ export class Cocina {
 
     
     public aQueEstacionVa(producto: ProductoUnico): Estacion {
-        const tipo = producto.estacionDeCocina();
-        for (const estacion of this.estaciones) {
-            if (estacion.getTipo() === tipo) {
-                return estacion;
+        const estacion = this.buscarEstacion(producto);
+        if (estacion === undefined) {
+            throw new Error("No hay ninguna estación de tipo " + TipoEstacion[producto.estacionDeCocina()]);
+        }
+        return estacion;
+    }
+    
+    public puedeRecibir(item: ItemPedido): boolean {
+        for (const producto of item.getProducto().productosDeCocina()) {
+            if (this.buscarEstacion(producto) === undefined) {
+                return false;
             }
         }
-        throw new Error("No hay ninguna estación de tipo " + TipoEstacion[tipo]);
+        return true;
     }
-
    
     public enviarItem(item: ItemPedido): void {
+        if (!this.puedeRecibir(item)) {
+            throw new Error("La cocina no puede recibir el ítem: falta una estación");
+        }
         const partes: ItemPedido[] = [];
         for (const producto of item.getProducto().productosDeCocina()) {
             const parte = new ItemPedido(item.getCodigo(), producto, item.getCantidad());
@@ -30,5 +39,15 @@ export class Cocina {
             partes.push(parte);
         }
         item.asignarPartes(partes);
+    }
+
+    private buscarEstacion(producto: ProductoUnico): Estacion | undefined {
+        const tipo = producto.estacionDeCocina();
+        for (const estacion of this.estaciones) {
+            if (estacion.getTipo() === tipo) {
+                return estacion;
+            }
+        }
+        return undefined;
     }
 }
