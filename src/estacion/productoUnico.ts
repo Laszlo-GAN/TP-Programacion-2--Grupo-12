@@ -5,8 +5,8 @@ export class ProductoUnico extends Producto {
     private precioBase: number;
     private tipoEstacion: TipoEstacion;
 
-    public constructor(precioBase: number, tipoEstacion: TipoEstacion) {
-        super();
+    public constructor(precioBase: number, tipoEstacion: TipoEstacion, nombre: string = "Producto") {
+        super(nombre);
         this.precioBase = precioBase;
         this.tipoEstacion = tipoEstacion;
     }
@@ -14,13 +14,11 @@ export class ProductoUnico extends Producto {
     public calcularPrecio(): number {
         return this.precioBase;
     }
-
    
     public estacionDeCocina(): TipoEstacion {
         return this.tipoEstacion;
     }
 
-    
     public productosDeCocina(): ProductoUnico[] {
         return [this];
     }

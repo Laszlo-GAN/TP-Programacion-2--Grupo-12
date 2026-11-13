@@ -1,37 +1,66 @@
+import { Pedido } from "../pedidos/pedido";
 import { EstrategiaBeneficio } from "./EstrategiaBeneficio";
 import { Factura } from "./factura";
+import { Historial } from "./Historial";
 import { ItemFactura } from "./ItemFactura";
 import { MedioDePago } from "./MedioDePago";
 
-export class FacturadorService {
-  
-  
-  public generarFactura(pedido: any, medioDePago: MedioDePago, beneficiosDisponibles: EstrategiaBeneficio[] = []): Factura {
-    
-    if (!pedido.puedeFacturarse()) {
-        throw new Error("El pedido no cumple con las condiciones para ser facturado.");
-    }
-    const itemsFactura: ItemFactura[] = pedido.obtenerItemsParaFactura(); 
-    const subtotalBruto = itemsFactura.reduce((acc, i) => acc + i.subtotal, 0);
-    
-    let mejorDescuentoMonto = 0;
-    if (beneficiosDisponibles.length > 0) {
-        let menorPrecioFinal = subtotalBruto;
+const SIN_DESCUENTO = 0;
 
-            for (const beneficio of beneficiosDisponibles) {
-                const precioConBeneficio = beneficio.aplicarDescuento(subtotalBruto);
-                    if (precioConBeneficio < menorPrecioFinal) {
-                        menorPrecioFinal = precioConBeneficio;
-                        mejorDescuentoMonto = subtotalBruto - menorPrecioFinal;
-            }
+function sumarSubtotales(items: ItemFactura[]): number {
+    let total = 0;
+    for (const item of items) {
+        total += item.subtotal;
+    }
+    return total;
+}
+
+function elegirMejorDescuento(
+    beneficios: EstrategiaBeneficio[],
+    medioDePago: MedioDePago,
+    fecha: Date,
+    subtotal: number,
+): number {
+    let mejorDescuento = SIN_DESCUENTO;
+    for (const beneficio of beneficios) {
+        if (beneficio.tieneBeneficio(medioDePago, fecha)) {
+            mejorDescuento = Math.max(mejorDescuento, beneficio.beneficio(subtotal));
         }
     }
+    return mejorDescuento;
+}
 
-    const totalFinal = Math.max(0, subtotalBruto - mejorDescuentoMonto);
-    const factura = new Factura(new Date(), itemsFactura, subtotalBruto, mejorDescuentoMonto, totalFinal,   medioDePago, pedido.getCodigo());
-  
-    pedido.finalizar();
+export class FacturadorService {
+    private historial: Historial;
 
-    return factura;
+    public constructor(historial: Historial) {
+        this.historial = historial;
+    }
+
+    public generarFactura(
+        pedido: Pedido,
+        medioDePago: MedioDePago,
+        beneficiosDisponibles: EstrategiaBeneficio[] = [],
+        fecha: Date = new Date(),
+    ): Factura {
+        if (!pedido.puedeFacturarse()) {
+            throw new Error("El pedido no cumple con las condiciones para ser facturado.");
+        }
+        const itemsFactura = pedido.obtenerItemsParaFactura();
+        const subtotal = sumarSubtotales(itemsFactura);
+        const descuento = Math.min(elegirMejorDescuento(beneficiosDisponibles, medioDePago, fecha, subtotal), subtotal);
+        const factura = new Factura(
+            fecha,
+            itemsFactura,
+            subtotal,
+            descuento,
+            subtotal - descuento,
+            medioDePago,
+            pedido.getCodigo(),
+        );
+
+        this.historial.registrar(factura);
+        pedido.finalizar();
+        return factura;
     }
 }

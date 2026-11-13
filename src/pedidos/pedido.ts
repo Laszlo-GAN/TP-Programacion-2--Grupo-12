@@ -5,6 +5,7 @@ import { AgregarItem } from "./agregarItem";
 import { EstadoPedido } from "./statePedido/estadoPedido";
 import { QuitarItem } from "./quitarItem";
 import PedidoEnConstruccion from "./statePedido/pedidoEnConstruccion";
+import { ItemFactura } from "../facturacion/ItemFactura";
 
 const SIN_ITEMS = 0;
 
@@ -24,6 +25,10 @@ export abstract class Pedido {
     }
    
     public abstract datosDelPedido(): string;
+
+    public getCodigo(): string {
+        return this.codigo;
+    }
 
     public getEstado(): EstadoPedido {
         return this.estado;
@@ -60,12 +65,22 @@ export abstract class Pedido {
         ultima.deshacer();
     }
 
+    private verificarQueLaCocinaPuedeRecibirTodo(cocina: Cocina): void {
+        for (const item of this.items) {
+            if (!cocina.puedeRecibir(item)) {
+                throw new Error("La cocina no tiene una estación para todos los ítems: el pedido no se confirmó");
+            }
+        }
+    }
+
     public confirmar(cocina: Cocina): void {
         this.verificarEnConstruccion();
         
         if (this.items.length === SIN_ITEMS) {
             throw new Error("No se puede confirmar un pedido sin ítems");
         }
+        this.verificarQueLaCocinaPuedeRecibirTodo(cocina);
+
         for (const item of this.items) {
             cocina.enviarItem(item);
         }
@@ -103,5 +118,23 @@ export abstract class Pedido {
             throw new Error("El pedido ya no está en construcción: no se puede modificar");
         }
     }
+
+    public calcularTotal(): number {
+        return this.calcularTotalProductos();
+    }
     
+    public obtenerItemsParaFactura(): ItemFactura[] {
+        const itemsFactura: ItemFactura[] = [];
+        for (const item of this.items) {
+            const producto = item.getProducto();
+            const precioUnitario = producto.calcularPrecio();
+            itemsFactura.push({
+                descripcion: producto.getNombre(),
+                cantidad: item.getCantidad(),
+                precioUnitario: precioUnitario,
+                subtotal: precioUnitario * item.getCantidad(),
+            });
+        }
+        return itemsFactura;
+    }
 }

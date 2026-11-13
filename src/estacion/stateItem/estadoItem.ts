@@ -16,12 +16,12 @@ export abstract class EstadoItem {
         this.estaListo = false;
         this.estaEnPreparacion = false;
         this.estaPendiente = false;
-        this.nombre = ""
+        this.nombre = "";
         this.motivoNoPuedePrepararse = "El item ya esta en preparacion";
         this.motivoNoPuedeTerminarse = "El item no fuee terminado aun";
     }
 
-    public getNombre(): string{
+    public getNombre(): string {
         return this.nombre;
     }
 
@@ -49,11 +49,11 @@ export abstract class EstadoItem {
         return this.estaPendiente;
     }
 
-    public listo(): void{
+    public listo(): void {
         throw new Error(this.motivoNoPuedeTerminarse);
     }
     
-    public enPreparacion(): void{
+    public enPreparacion(): void {
         throw new Error(this.motivoNoPuedePrepararse);
     }
 }

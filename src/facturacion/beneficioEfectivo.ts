@@ -1,17 +1,22 @@
 import { EstrategiaBeneficio } from "./EstrategiaBeneficio";
+import { MedioDePago } from "./MedioDePago";
 
-export class DescuentoPorcentual implements EstrategiaBeneficio {
-    private porcentaje: number
-   
-    constructor(porcentaje: number) {
+const PORCENTAJE_TOTAL = 100;
+
+export class BeneficioEfectivo implements EstrategiaBeneficio {
+    private medioQueAplica: MedioDePago;
+    private porcentaje: number;
+ 
+    public constructor(porcentaje: number) {
+        this.medioQueAplica = MedioDePago.EFECTIVO;
         this.porcentaje = porcentaje;
     }
-
-    public calcularBeneficio(precioBase: number): number {
-        return precioBase * (1 - this.porcentaje / 100);
+ 
+    public tieneBeneficio(medioDePago: MedioDePago): boolean {
+        return medioDePago === this.medioQueAplica;
     }
-
-    public obtenerDescripcion(): string {
-        return `Descuento del ${this.porcentaje}%`;
+ 
+    public beneficio(total: number): number {
+        return total * this.porcentaje / PORCENTAJE_TOTAL;
     }
 }

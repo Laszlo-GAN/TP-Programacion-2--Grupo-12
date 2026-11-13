@@ -1,6 +1,8 @@
+import { MedioDePago } from "./MedioDePago";
 
 export interface EstrategiaBeneficio {
-    aplicarDescuento(subtotalBruto: number): number;
-    calcularBeneficio(precioBase: number): number;
-    obtenerDescripcion(): string;
+    
+    tieneBeneficio(medioDePago: MedioDePago, fecha: Date): boolean;
+    beneficio(total: number): number;
+
 }
