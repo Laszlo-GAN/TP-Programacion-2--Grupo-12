@@ -1,0 +1,74 @@
+@startuml
+skinparam style strictuml
+title Requerimiento 2: Facturar un pedido confirmado
+
+actor Cajero
+participant Facturador
+participant Pedido
+participant Beneficio
+participant Factura
+participant Historial
+participant EstadoConfirmado
+participant EstadoFinalizado
+
+Cajero -> Facturador : generarFactura(pedido, medioDePago, beneficios, fecha)
+activate Facturador
+
+Facturador -> Pedido : puedeFacturarse()
+activate Pedido
+Pedido --> Facturador : true
+deactivate Pedido
+
+Facturador -> Pedido : obtenerItemsParaFactura()
+activate Pedido
+Pedido --> Facturador : itemsFactura
+deactivate Pedido
+
+Facturador -> Facturador : subtotal = sumarSubtotales(itemsFactura)
+
+loop for beneficio of beneficios
+    Facturador -> Beneficio : tieneBeneficio(medioDePago, fecha)
+    activate Beneficio
+    Beneficio --> Facturador : true
+    deactivate Beneficio
+
+    Facturador -> Beneficio : beneficio(subtotal)
+    activate Beneficio
+    Beneficio --> Facturador : montoDescuento
+    deactivate Beneficio
+end
+
+Facturador -> Pedido : getCodigo()
+activate Pedido
+Pedido --> Facturador : codigoPedido
+deactivate Pedido
+
+create Factura
+Facturador -> Factura : new Factura(fecha, itemsFactura, subtotal, descuento, totalAPagar, medioDePago, codigoPedido)
+
+Facturador -> Historial : registrar(factura)
+activate Historial
+Historial -> Historial : estaFacturado(codigoPedido)
+Historial --> Facturador
+deactivate Historial
+
+Facturador -> Pedido : finalizar()
+activate Pedido
+Pedido -> Pedido : puedeFacturarse()
+Pedido -> EstadoConfirmado : finalizarPedido()
+activate EstadoConfirmado
+create EstadoFinalizado
+EstadoConfirmado -> EstadoFinalizado : new PedidoFinalizado(pedido)
+EstadoConfirmado -> Pedido : cambiarEstado(nuevoEstado)
+activate Pedido
+Pedido -> EstadoFinalizado : setPedido(pedido)
+Pedido --> EstadoConfirmado
+deactivate Pedido
+EstadoConfirmado --> Pedido
+deactivate EstadoConfirmado
+Pedido --> Facturador
+deactivate Pedido
+
+Facturador --> Cajero : factura
+deactivate Facturador
+@enduml

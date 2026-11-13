@@ -1,0 +1,32 @@
+@startuml
+title Requerimiento 1: Agregar un ítem a un pedido en construcción
+
+actor Mozo
+participant Pedido
+participant Estado
+participant Accion
+
+Mozo -> Pedido : agregarItem(item)
+activate Pedido
+
+Pedido -> Pedido : verificarEnConstruccion()
+activate Pedido
+Pedido -> Estado : getConfirmarModificacion()
+activate Estado
+Estado --> Pedido : true
+deactivate Estado
+deactivate Pedido
+
+create Accion
+Pedido -> Accion : new AgregarItem(items, item)
+
+Pedido -> Accion : aplicar()
+activate Accion
+Accion --> Pedido
+deactivate Accion
+
+Pedido -> Pedido : historial.push(accion)
+
+Pedido --> Mozo
+deactivate Pedido
+@enduml
