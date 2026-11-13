@@ -14,7 +14,7 @@ export class PedidoEnvio extends Pedido {
     }
 
     public datosDelPedido(): string {
-        return `Su Pedido sera enviado a ${this.direccion}, El envio sale: $${this.costoEnvio} .gracias por su compra.`;
+        return `Su Pedido sera enviado a ${this.direccion}, El envio sale: $${this.costoEnvio}, ¡Gracias por su compra!`;
     }
 
     public override obtenerItemsParaFactura(): ItemFactura[] {

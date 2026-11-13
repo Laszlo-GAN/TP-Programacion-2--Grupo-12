@@ -65,14 +65,6 @@ export abstract class Pedido {
         ultima.deshacer();
     }
 
-    private verificarQueLaCocinaPuedeRecibirTodo(cocina: Cocina): void {
-        for (const item of this.items) {
-            if (!cocina.puedeRecibir(item)) {
-                throw new Error("La cocina no tiene una estación para todos los ítems: el pedido no se confirmó");
-            }
-        }
-    }
-
     public confirmar(cocina: Cocina): void {
         this.verificarEnConstruccion();
         
@@ -113,11 +105,6 @@ export abstract class Pedido {
         }
         return total;
     }
-    private verificarEnConstruccion(): void {
-        if (!this.estado.getConfirmarModificacion()) {
-            throw new Error("El pedido ya no está en construcción: no se puede modificar");
-        }
-    }
 
     public calcularTotal(): number {
         return this.calcularTotalProductos();
@@ -136,5 +123,19 @@ export abstract class Pedido {
             });
         }
         return itemsFactura;
+    }
+
+    private verificarQueLaCocinaPuedeRecibirTodo(cocina: Cocina): void {
+        for (const item of this.items) {
+            if (!cocina.puedeRecibir(item)) {
+                throw new Error("La cocina no tiene una estación para todos los ítems: el pedido no se confirmó");
+            }
+        }
+    }
+
+    private verificarEnConstruccion(): void {
+        if (!this.estado.getConfirmarModificacion()) {
+            throw new Error("El pedido ya no está en construcción: no se puede modificar");
+        }
     }
 }

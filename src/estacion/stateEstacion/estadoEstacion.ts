@@ -14,7 +14,7 @@ export abstract class EstadoEstacion {
         this.disponible = false;
         this.motivoNoPuedeOcuparse = "La estacion no esta Libre, no se puede ocupar";
         this.motivoNoPuedeLiberarse = "La estacion esta Procesando un pedido, no se puede liberar";
-        this.motivoNoPuedeProcesar = "La estacion esta Libre, no se puede proceser";
+        this.motivoNoPuedeProcesar = "La estacion esta Libre, no se puede procesar";
     }
 
     public setEstacion(estacion: Estacion): void {
@@ -33,7 +33,7 @@ export abstract class EstadoEstacion {
         return this.disponible;
     }
 
-   public ocuparse(): void {
+    public ocuparse(): void {
         throw new Error(this.motivoNoPuedeOcuparse);
     }
 
