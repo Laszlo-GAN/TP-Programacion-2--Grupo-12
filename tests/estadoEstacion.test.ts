@@ -3,7 +3,6 @@ import { EstadoEstacion } from "../src/estacion/stateEstacion/estadoEstacion";
 import EstacionLibre from "../src/estacion/stateEstacion/estacionLibre";
 import EstacionOcupada from "../src/estacion/stateEstacion/estacionOcupada";
 import { EstacionMock } from "./mocks";
-import { Estacion } from "../src/estacion/estacion";
 
 describe("Test para las clases de EstadoEstacion", () => {
     class EstadoEstacionConcreto extends EstadoEstacion {
@@ -67,7 +66,7 @@ describe("Test para las clases de EstadoEstacion", () => {
     })
 
     test("Verifico que no procese el siguiente si sigue Ocupada", () => {
-        expect(estadoOcupado.procesarSiguiente()).toBeUndefined;
+        expect(() => estadoOcupado.procesarSiguiente()).toThrow("La estación está ocupada con otro ítem");
     })
 
     test("Verifico que no se pueda volver a Liberar", () => {
@@ -75,6 +74,6 @@ describe("Test para las clases de EstadoEstacion", () => {
     })
 
     test("Verifico que no se pueda volver a Ocupar", () => {
-        expect(estadoOcupado.ocuparse()).toBeUndefined();
+        expect(() => estadoOcupado.ocuparse()).toThrow("La estación ya se encuentra ocupada");
     })
 });

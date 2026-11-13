@@ -10,8 +10,6 @@ describe("Test clase Estacion", () => {
 
     beforeEach(() => {
         instance = new EstacionConcreta("Estación Uno", TipoEstacion.PARRILLA);
-
-        instance.cambiarEstado(estadoEstacionMock);
     });
 
     test("Verifico que sea instancia de la clase Estación", () => {
@@ -33,6 +31,7 @@ describe("Test clase Estacion", () => {
     });
 
     test("Verifico que procese correctamente el Item Actual", () => {
+        instance.cambiarEstado(estadoEstacionMock)
         instance.recibirItems(ItemPedidoMock);
         const itemActual = instance.procesarItemActual();
 
@@ -43,6 +42,7 @@ describe("Test clase Estacion", () => {
     });
 
     test("Verifico que reciba los items correctamente", () => {
+        instance.cambiarEstado(estadoEstacionMock)
         instance.recibirItems(ItemPedidoMock);
 
         expect(estadoEstacionMock.procesarSiguiente).toHaveBeenCalled;
@@ -50,6 +50,7 @@ describe("Test clase Estacion", () => {
     });
 
     test("Verifico que termine el item actual correctamente", () => {
+        instance.cambiarEstado(estadoEstacionMock)
         instance.setItemActual(ItemPedidoMock);
         instance.terminarItemActual();
 
