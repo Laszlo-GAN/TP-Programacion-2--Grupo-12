@@ -17,6 +17,7 @@ abstract class Pedido {
   
   + {abstract} datosDelPedido(): string
   + getEstado(): EstadoPedido
+  + cambiarEstado(estado: EstadoPedido): void
   + agregarItem(item: ItemPedido): void
   + quitarItem(item: ItemPedido): void
   + deshacerUltimaModificacion(): void
@@ -301,12 +302,64 @@ BeneficioCombo <|.. PrecioFijo
 
 '========== factura =======
 
-class Factura{
-  - medioDePago: MedioDePago
+class FacturadorService {
+  - historial: Historial
+
+  + generarFactura(pedido: Pedido, medioDePago: MedioDePago, beneficiosDisponibles: EstrategiaBeneficio[], fecha: Date): Factura
+}
+
+class Factura {
   - fecha: Date
-  - totalApagar: number
-  - tieneBeneficio: boolean
-  - pedido: Pedido
+  - items: ItemFactura[]
+  - subTotal: number
+  - beneficioAplicado: number
+  - totalAPagar: number
+  - medioDePago: MedioDePago
+  - codigoPedido: string
+
+  + getFecha(): Date
+  + getItems(): ItemFactura[]
+  + getSubTotal(): number
+  + getTotalAPagar(): number
+  + getBeneficioAplicado(): number
+  + getMedioDePago(): MedioDePago
+  + getCodigoPedido(): string
+}
+
+class Historial {
+  - facturas: Factura[]
+
+  + registrar(factura: Factura): void
+  + consultar(): Factura[]
+  - estaFacturado(codigoPedido: string): boolean
+}
+
+interface ItemFactura {
+  + descripcion: string
+  + cantidad: number
+  + precioUnitario: number
+  + subtotal: number
+}
+
+interface EstrategiaBeneficio {
+  + tieneBeneficio(medioDePago: MedioDePago, fecha: Date): boolean
+  + beneficio(total: number): number
+}
+
+class BeneficioEfectivo {
+  - medioQueAplica: MedioDePago
+  - porcentaje: number
+
+  + tieneBeneficio(medioDePago: MedioDePago): boolean
+  + beneficio(total: number): number
+}
+
+class BeneficioPorDia {
+  - diaDeLaSemana: DiaDeLaSemana
+  - porcentaje: number
+
+  + tieneBeneficio(_medioDePago: unknown, fecha: Date): boolean
+  + beneficio(total: number): number
 }
 
 enum MedioDePago {
@@ -316,9 +369,27 @@ enum MedioDePago {
   BILLETERA_VIRTUAL
 }
 
-Factura --> Pedido
+enum DiaDeLaSemana {
+  DOMINGO
+  LUNES
+  MARTES
+  MIERCOLES
+  JUEVES
+  VIERNES
+  SABADO
+}
+
+FacturadorService --> Historial
+FacturadorService ..> Pedido
+FacturadorService ..> EstrategiaBeneficio
+FacturadorService ..> Factura
+FacturadorService ..> ItemFactura
+Historial o-- Factura
+Factura *-- ItemFactura
 Factura --> MedioDePago
-Factura --> Beneficio
-Factura --> AplicaBeneficio
+BeneficioEfectivo ..|> EstrategiaBeneficio
+BeneficioPorDia ..|> EstrategiaBeneficio
+BeneficioEfectivo --> MedioDePago
+BeneficioPorDia --> DiaDeLaSemana
 
 @enduml
